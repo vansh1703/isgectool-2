@@ -1,0 +1,1242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MechEntry Pro v3</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+:root {
+  --bg:#0d0f14; --surface:#13161e; --surface2:#1a1e2a; --surface3:#222736;
+  --border:#2a3045; --border-active:#3d4f7a;
+  --accent:#4f8ef7; --accent2:#38d9a9; --accent3:#f7c94f;
+  --danger:#f76f6f; --purple:#8b6fd4; --purple-dim:rgba(139,111,212,.15);
+  --text:#e8eaf0; --text2:#8a93b0; --text3:#545d7a;
+  --mono:'IBM Plex Mono',monospace; --sans:'IBM Plex Sans',sans-serif;
+  --r:6px; --shadow:0 4px 24px rgba(0,0,0,.45);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;}
+
+/* HEADER */
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 20px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200;}
+.logo{display:flex;align-items:center;gap:10px;}
+.logo-icon{width:30px;height:30px;background:var(--accent);border-radius:6px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:13px;font-weight:700;color:#fff;}
+.logo-text{font-weight:700;font-size:15px;}
+.logo-sub{font-size:10px;color:var(--text2);font-family:var(--mono);}
+.hdr-btns{display:flex;gap:6px;align-items:center;}
+
+/* TABS */
+.tabs{background:var(--surface);border-bottom:1px solid var(--border);padding:0 20px;display:flex;overflow-x:auto;}
+.tab-btn{padding:9px 18px;font-size:13px;font-weight:500;color:var(--text2);background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap;transition:all .15s;}
+.tab-btn:hover{color:var(--text);}
+.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent);}
+
+/* MAIN */
+main{flex:1;padding:16px 20px;overflow:hidden;}
+.tab-panel{display:none;height:100%;}
+.tab-panel.active{display:flex;flex-direction:column;}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:5px;padding:6px 13px;border-radius:var(--r);border:1px solid transparent;font-family:var(--sans);font-size:13px;font-weight:500;cursor:pointer;transition:all .15s;white-space:nowrap;}
+.btn-primary{background:var(--accent);color:#fff;}
+.btn-primary:hover{background:#3a7be0;}
+.btn-success{background:var(--accent2);color:#071a10;}
+.btn-success:hover{background:#2bbf93;}
+.btn-warn{background:var(--accent3);color:#1a1200;}
+.btn-warn:hover{background:#e8b83a;}
+.btn-purple{background:var(--purple);color:#fff;}
+.btn-purple:hover{background:#7a5ec0;}
+.btn-ghost{background:transparent;color:var(--text2);border-color:var(--border);}
+.btn-ghost:hover{color:var(--text);border-color:var(--border-active);}
+.btn-danger{background:transparent;color:var(--danger);border-color:var(--danger);}
+.btn-danger:hover{background:rgba(247,111,111,.1);}
+.btn-sm{padding:3px 9px;font-size:12px;}
+.btn-icon{width:28px;height:28px;padding:0;display:inline-flex;align-items:center;justify-content:center;border-radius:var(--r);border:1px solid var(--border);background:var(--surface2);color:var(--text2);cursor:pointer;font-size:14px;transition:all .15s;}
+.btn-icon:hover{border-color:var(--border-active);color:var(--text);}
+.btn-icon.del:hover{border-color:var(--danger);color:var(--danger);}
+
+/* INPUTS */
+input,select,textarea{background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:var(--r);font-family:var(--sans);font-size:13px;padding:6px 10px;outline:none;transition:border .15s;width:100%;}
+input:focus,select:focus,textarea:focus{border-color:var(--accent);}
+input::placeholder{color:var(--text3);}
+select option{background:var(--surface2);}
+
+/* STATS */
+.stats-bar{display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap;flex-shrink:0;}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 14px;flex:1;min-width:110px;}
+.stat-lbl{font-size:10px;font-family:var(--mono);color:var(--text3);text-transform:uppercase;letter-spacing:.06em;}
+.stat-val{font-size:18px;font-weight:700;font-family:var(--mono);margin-top:1px;}
+.stat-val.blue{color:var(--accent);}
+.stat-val.green{color:var(--accent2);}
+
+/* TOOLBAR */
+.toolbar{display:flex;gap:8px;align-items:center;margin-bottom:10px;flex-wrap:wrap;flex-shrink:0;}
+.search-box{position:relative;flex:1;min-width:160px;max-width:300px;}
+.search-box input{padding-left:30px;}
+.search-box .si{position:absolute;left:9px;top:50%;transform:translateY(-50%);color:var(--text3);font-size:13px;pointer-events:none;}
+.rec-count{font-size:11px;font-family:var(--mono);color:var(--text3);}
+
+/* ═══════════════════════════════════════
+   GROUPED TABLE
+═══════════════════════════════════════ */
+.table-wrap{overflow:auto;border-radius:8px;border:1px solid var(--border);flex:1;min-height:0;}
+.table-wrap::-webkit-scrollbar{width:6px;height:6px;}
+.table-wrap::-webkit-scrollbar-track{background:var(--surface);}
+.table-wrap::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+
+table{border-collapse:collapse;font-size:12px;white-space:nowrap;}
+/* Group header row */
+thead tr.group-row th{
+  background:var(--surface3);
+  border-bottom:1px solid var(--border);
+  border-right:1px solid var(--border-active);
+  font-family:var(--mono);font-size:10px;font-weight:700;
+  color:var(--accent3);text-transform:uppercase;letter-spacing:.05em;
+  padding:5px 10px;text-align:center;position:sticky;top:0;z-index:20;
+}
+thead tr.group-row th.no-group{background:var(--surface2);color:var(--text3);}
+/* Sub-header row */
+thead tr.sub-row th{
+  background:var(--surface2);
+  border-bottom:1px solid var(--border);
+  border-right:1px solid var(--border);
+  font-family:var(--mono);font-size:10px;font-weight:600;
+  color:var(--text2);text-transform:uppercase;letter-spacing:.04em;
+  padding:6px 10px;text-align:left;
+  position:sticky;top:28px;z-index:19;
+}
+thead tr.sub-row th.formula-th{color:var(--purple);}
+thead tr.sub-row th.act-th{text-align:center;width:64px;}
+thead tr.sub-row th.num-th{width:36px;color:var(--text3);}
+
+tbody tr{border-bottom:1px solid var(--border);transition:background .1s;}
+tbody tr:last-child{border-bottom:none;}
+tbody tr:hover{background:rgba(255,255,255,.025);}
+tbody tr.editing{background:rgba(79,142,247,.06);}
+tbody tr.highlighted{background:rgba(56,217,169,.05);}
+
+td{padding:6px 10px;border-right:1px solid rgba(42,48,69,.5);color:var(--text);max-width:180px;overflow:hidden;text-overflow:ellipsis;vertical-align:middle;}
+td.group-border{border-right:1px solid var(--border-active);}
+td.formula-cell{color:var(--purple);font-family:var(--mono);font-size:11px;}
+td.act-td{display:flex;gap:3px;justify-content:center;border-right:none;}
+td.num-td{font-family:var(--mono);font-size:10px;color:var(--text3);width:36px;}
+td input,td select{padding:3px 6px;font-size:11px;height:24px;width:100%;}
+td input[type=number]{max-width:90px;}
+td input[type=date]{max-width:130px;}
+
+.empty-state{text-align:center;padding:60px 20px;color:var(--text3);}
+.empty-state .ei{font-size:36px;margin-bottom:10px;}
+.empty-state p{font-size:13px;}
+
+/* ═══════════════════════════════════════
+   COLUMN SETUP
+═══════════════════════════════════════ */
+.setup-panel{display:flex;gap:14px;height:100%;min-height:0;}
+.setup-left{flex:1;min-width:0;display:flex;flex-direction:column;gap:12px;overflow-y:auto;}
+.setup-right{width:300px;flex-shrink:0;display:flex;flex-direction:column;gap:12px;overflow-y:auto;}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;}
+.card-title{font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.08em;font-family:var(--mono);margin-bottom:12px;}
+
+/* Group list */
+.group-item{background:var(--surface2);border:1px solid var(--border);border-radius:8px;margin-bottom:8px;overflow:hidden;}
+.group-hdr{display:flex;align-items:center;gap:8px;padding:8px 12px;cursor:pointer;user-select:none;}
+.group-hdr:hover{background:rgba(255,255,255,.03);}
+.group-name{font-weight:600;font-size:13px;flex:1;}
+.group-badge{font-size:10px;color:var(--text3);font-family:var(--mono);}
+.group-toggle{color:var(--text3);font-size:11px;transition:transform .2s;}
+.group-toggle.open{transform:rotate(90deg);}
+.group-cols{padding:0 12px 10px 28px;display:none;}
+.group-cols.open{display:block;}
+.col-row-item{display:flex;align-items:center;gap:6px;padding:4px 0;border-bottom:1px solid rgba(42,48,69,.4);}
+.col-row-item:last-child{border-bottom:none;}
+.col-chip-name{flex:1;font-size:12px;font-family:var(--mono);overflow:hidden;text-overflow:ellipsis;}
+.type-pill{font-size:9px;padding:1px 5px;border-radius:3px;text-transform:uppercase;font-family:var(--mono);}
+.tp-text{background:rgba(79,142,247,.15);color:var(--accent);}
+.tp-number{background:rgba(56,217,169,.15);color:var(--accent2);}
+.tp-date{background:rgba(247,201,79,.15);color:var(--accent3);}
+.tp-select{background:rgba(247,111,111,.15);color:var(--danger);}
+.tp-formula{background:var(--purple-dim);color:var(--purple);}
+
+/* Add fields */
+.field-row{display:flex;gap:6px;align-items:flex-start;flex-wrap:wrap;margin-bottom:8px;}
+.field-row input,.field-row select{max-width:160px;}
+
+/* ═══════════════════════════════════════
+   FORMULA MANAGER
+═══════════════════════════════════════ */
+.fm-list{display:flex;flex-direction:column;gap:8px;margin-bottom:12px;max-height:260px;overflow-y:auto;}
+.fm-item{background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:10px 12px;}
+.fm-item-hdr{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+.fm-col-name{font-size:12px;font-weight:600;}
+.fm-group-tag{font-size:10px;color:var(--text3);font-family:var(--mono);}
+.fm-formula-box{font-family:var(--mono);font-size:12px;color:var(--accent3);background:var(--surface3);border-radius:4px;padding:5px 8px;word-break:break-all;cursor:text;}
+.fm-no-formula{font-size:12px;color:var(--text3);font-style:italic;}
+
+/* Formula builder */
+.fb-col-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:5px;max-height:130px;overflow-y:auto;margin:8px 0;}
+.fb-col-btn{background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:4px 7px;font-family:var(--mono);font-size:11px;cursor:pointer;color:var(--text2);text-align:left;transition:all .15s;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.fb-col-btn:hover{border-color:var(--accent);color:var(--accent);}
+.fb-ops{display:flex;gap:5px;flex-wrap:wrap;margin:6px 0;}
+.fb-op{background:var(--surface3);border:1px solid var(--border);border-radius:4px;padding:3px 9px;font-family:var(--mono);font-size:13px;cursor:pointer;color:var(--accent3);transition:all .15s;}
+.fb-op:hover{border-color:var(--accent3);}
+.fb-preview{font-family:var(--mono);font-size:12px;color:var(--accent3);background:var(--surface3);border:1px solid var(--border-active);border-radius:var(--r);padding:7px 10px;min-height:32px;margin:6px 0;word-break:break-all;}
+
+/* ═══════════════════════════════════════
+   IMPORT
+═══════════════════════════════════════ */
+.import-zone{border:2px dashed var(--border);border-radius:10px;padding:36px 20px;text-align:center;cursor:pointer;transition:all .2s;margin-bottom:14px;}
+.import-zone:hover,.import-zone.drag-active{border-color:var(--accent);background:rgba(79,142,247,.04);}
+.import-zone h3{font-size:15px;margin:10px 0 5px;}
+.import-zone p{font-size:13px;color:var(--text2);}
+#importFileInput{display:none;}
+.import-preview-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:12px;}
+.import-groups{display:flex;flex-direction:column;gap:6px;max-height:260px;overflow-y:auto;margin:10px 0;}
+.ig-item{background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:8px 12px;}
+.ig-hdr{display:flex;align-items:center;gap:8px;margin-bottom:5px;}
+.ig-name{font-weight:600;font-size:13px;flex:1;}
+.ig-sub-cols{display:flex;flex-wrap:wrap;gap:4px;}
+.ig-col-check{display:flex;align-items:center;gap:4px;font-size:11px;font-family:var(--mono);cursor:pointer;}
+.ig-col-check input{width:auto;}
+.fml-badge{font-size:9px;padding:1px 4px;background:var(--purple-dim);color:var(--purple);border-radius:3px;font-family:var(--mono);}
+
+/* TOAST */
+#toast{position:fixed;bottom:20px;right:20px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);padding:9px 14px;font-size:13px;z-index:9999;display:flex;align-items:center;gap:7px;box-shadow:var(--shadow);transform:translateY(80px);opacity:0;transition:all .25s;max-width:340px;}
+#toast.show{transform:translateY(0);opacity:1;}
+#toast.success{border-color:var(--accent2);color:var(--accent2);}
+#toast.error{border-color:var(--danger);color:var(--danger);}
+#toast.info{border-color:var(--accent);color:var(--accent);}
+
+/* MODAL */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:300;align-items:center;justify-content:center;}
+.modal-bg.show{display:flex;}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:22px;width:min(520px,95vw);box-shadow:var(--shadow);max-height:92vh;overflow-y:auto;}
+.modal h3{font-size:15px;margin-bottom:14px;}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:14px;}
+.section-lbl{font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.07em;font-family:var(--mono);margin-bottom:6px;}
+
+/* Templates */
+.tpl-item{background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:12px;margin-bottom:8px;display:flex;align-items:center;gap:10px;}
+.tpl-info{flex:1;min-width:0;}
+.tpl-name{font-weight:600;font-size:13px;margin-bottom:2px;}
+.tpl-meta{font-size:11px;color:var(--text3);font-family:var(--mono);}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">ME</div>
+    <div><div class="logo-text">MechEntry Pro</div><div class="logo-sub">v3 · Grouped Headers + Formula Manager</div></div>
+  </div>
+  <div class="hdr-btns">
+    <button class="btn btn-success btn-sm" onclick="exportToExcel()">⬇ Export Excel</button>
+    <button class="btn btn-warn btn-sm" onclick="clearAllData()">🗑 Clear Rows</button>
+  </div>
+</header>
+
+<div class="tabs">
+  <button class="tab-btn active" onclick="switchTab('entry')">📋 Data Entry</button>
+  <button class="tab-btn" onclick="switchTab('columns')">⚙ Column Setup</button>
+  <button class="tab-btn" onclick="switchTab('formulas')">∑ Formula Manager</button>
+  <button class="tab-btn" onclick="switchTab('import')">📥 Import Excel</button>
+  <button class="tab-btn" onclick="switchTab('templates')">📁 Templates</button>
+</div>
+
+<main>
+
+<!-- ══ DATA ENTRY ══ -->
+<div class="tab-panel active" id="tab-entry">
+  <div class="stats-bar" id="statsBar"></div>
+  <div class="toolbar">
+    <div class="search-box"><span class="si">🔍</span><input id="searchInput" placeholder="Search any value…" oninput="filterRows()"></div>
+    <button class="btn btn-primary" onclick="addNewRow()">+ Add Row</button>
+    <button class="btn btn-ghost btn-sm" onclick="clearSearch()">✕ Clear</button>
+    <span class="rec-count" id="recCount"></span>
+  </div>
+  <div class="table-wrap">
+    <table id="mainTable">
+      <thead id="tHead"></thead>
+      <tbody id="tBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ══ COLUMN SETUP ══ -->
+<div class="tab-panel" id="tab-columns">
+  <div class="setup-panel">
+    <div class="setup-left">
+      <div class="card">
+        <div class="card-title">Column Groups</div>
+        <div id="groupList"></div>
+      </div>
+    </div>
+    <div class="setup-right">
+      <div class="card">
+        <div class="card-title">Add Group</div>
+        <div class="field-row">
+          <input id="newGroupName" placeholder="Group name (e.g. A-50060100)" style="max-width:100%">
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="addGroup()">+ Add Group</button>
+      </div>
+      <div class="card">
+        <div class="card-title">Add Column to Group</div>
+        <div class="field-row">
+          <select id="addColGroup" style="max-width:100%;margin-bottom:6px;"></select>
+        </div>
+        <div class="field-row">
+          <input id="newColName" placeholder="Column name…" style="margin-bottom:6px;">
+        </div>
+        <div class="field-row">
+          <select id="newColType" onchange="onNewColTypeChange()" style="max-width:140px;">
+            <option value="text">Text</option>
+            <option value="number">Number</option>
+            <option value="date">Date</option>
+            <option value="select">Dropdown</option>
+            <option value="formula">Formula ∑</option>
+          </select>
+          <input id="newColSelectOpts" placeholder="opt1, opt2…" style="display:none;max-width:150px;">
+        </div>
+        <div id="newColFormulaRow" style="display:none;margin-bottom:8px;">
+          <div style="font-size:11px;color:var(--text3);font-family:var(--mono);margin-bottom:4px;">Formula (use [Column Name])</div>
+          <input id="newColFormula" placeholder="[Estimation Kgs]+[BAAN Kgs]" style="font-family:var(--mono);font-size:12px;color:var(--accent3);">
+          <button class="btn btn-purple btn-sm" style="margin-top:5px;width:100%" onclick="openFormulaBuilder('newcol')">∑ Open Builder</button>
+        </div>
+        <button class="btn btn-primary btn-sm" style="width:100%" onclick="addColumnToGroup()">+ Add Column</button>
+      </div>
+      <div class="card">
+        <div class="card-title">Ungrouped Columns</div>
+        <div id="ungroupedList" style="font-size:12px;color:var(--text3)">None</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ FORMULA MANAGER ══ -->
+<div class="tab-panel" id="tab-formulas">
+  <div style="display:flex;gap:14px;height:100%;min-height:0;">
+    <div style="flex:1;min-width:0;overflow-y:auto;">
+      <div class="card" style="margin-bottom:12px;">
+        <div class="card-title">All Formula Columns</div>
+        <div id="fmList"></div>
+      </div>
+    </div>
+    <div style="width:320px;flex-shrink:0;overflow-y:auto;">
+      <div class="card">
+        <div class="card-title">∑ Formula Builder</div>
+        <div class="section-lbl" style="margin-bottom:5px;">Click to insert column reference</div>
+        <div class="fb-col-grid" id="fbColGrid"></div>
+        <div class="section-lbl" style="margin-top:8px;">Operators</div>
+        <div class="fb-ops">
+          <span class="fb-op" onclick="fbAppend('+')">+</span>
+          <span class="fb-op" onclick="fbAppend('-')">−</span>
+          <span class="fb-op" onclick="fbAppend('*')">×</span>
+          <span class="fb-op" onclick="fbAppend('/')">÷</span>
+          <span class="fb-op" onclick="fbAppend('(')">(</span>
+          <span class="fb-op" onclick="fbAppend(')')">)</span>
+          <span class="fb-op" onclick="fbAppend('1000')" title="useful for /1000">1000</span>
+          <span class="fb-op" onclick="fbAppend('SUM(')">SUM(</span>
+          <span class="fb-op" onclick="fbAppend('AVG(')">AVG(</span>
+        </div>
+        <div class="section-lbl" style="margin-top:8px;">Preview</div>
+        <div class="fb-preview" id="fbPreview">—</div>
+        <input id="fbRawInput" placeholder="Type or edit formula directly…" style="font-family:var(--mono);font-size:12px;color:var(--accent3);margin-bottom:6px;" oninput="onFbRaw()">
+        <div style="font-size:11px;color:var(--text3);font-family:var(--mono);margin-bottom:8px;">Syntax: <span style="color:var(--accent2)">[Column Name]+[Other Col]/1000</span></div>
+        <div style="display:flex;gap:5px;flex-wrap:wrap;">
+          <button class="btn btn-ghost btn-sm" onclick="fbClear()">Clear</button>
+          <button class="btn btn-primary btn-sm" onclick="fbApply()">✓ Apply to Selected</button>
+        </div>
+        <div id="fbTarget" style="font-size:11px;color:var(--text3);margin-top:5px;font-family:var(--mono)">Select a formula column above first</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ IMPORT EXCEL ══ -->
+<div class="tab-panel" id="tab-import">
+  <div style="overflow-y:auto;flex:1;min-height:0;">
+    <div class="import-zone" id="importZone" onclick="document.getElementById('importFileInput').click()"
+         ondragover="event.preventDefault();this.classList.add('drag-active')"
+         ondragleave="this.classList.remove('drag-active')"
+         ondrop="handleDrop(event)">
+      <div style="font-size:36px">📂</div>
+      <h3>Drop your Excel file here</h3>
+      <p>Supports .xlsx · Reads grouped headers, sub-columns & formulas</p>
+      <input type="file" id="importFileInput" accept=".xlsx,.xls" onchange="handleImportFile(event)">
+    </div>
+    <div id="importPreview" style="display:none">
+      <div class="import-preview-card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+          <div>
+            <div style="font-weight:600;font-size:14px;" id="impFileName">—</div>
+            <div style="font-size:11px;color:var(--text2);font-family:var(--mono);" id="impMeta">—</div>
+          </div>
+          <button class="btn btn-ghost btn-sm" onclick="cancelImport()">✕ Cancel</button>
+        </div>
+        <div class="section-lbl">Select Groups & Columns to Import</div>
+        <div class="import-groups" id="impGroupList"></div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:10px;">
+          <label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer;color:var(--text2);">
+            <input type="checkbox" id="impWithData" style="width:auto" checked> Import data rows
+          </label>
+          <label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer;color:var(--text2);">
+            <input type="checkbox" id="impWithFormulas" style="width:auto" checked> Import formulas
+          </label>
+          <label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer;color:var(--text2);">
+            <input type="checkbox" id="impAppend" style="width:auto"> Append to existing
+          </label>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-primary" onclick="confirmImport()">✓ Import Selected</button>
+        <button class="btn btn-ghost" onclick="cancelImport()">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ TEMPLATES ══ -->
+<div class="tab-panel" id="tab-templates">
+  <div style="overflow-y:auto;flex:1;min-height:0;">
+    <div class="card" style="margin-bottom:12px;">
+      <div class="card-title">Save Current Setup as Template</div>
+      <div style="display:flex;gap:8px;">
+        <input id="tplName" placeholder="Template name…" style="max-width:280px;">
+        <button class="btn btn-primary" onclick="saveTpl()">💾 Save</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Saved Templates</div>
+      <div id="tplList"></div>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<!-- Edit Column Modal -->
+<div class="modal-bg" id="editColModal">
+  <div class="modal">
+    <h3>Edit Column</h3>
+    <div style="margin-bottom:10px;"><div class="section-lbl">Name</div><input id="ecName"></div>
+    <div style="margin-bottom:10px;"><div class="section-lbl">Type</div>
+      <select id="ecType" onchange="onEcTypeChange()">
+        <option value="text">Text</option><option value="number">Number</option>
+        <option value="date">Date</option><option value="select">Dropdown</option>
+        <option value="formula">Formula ∑</option>
+      </select>
+    </div>
+    <div id="ecSelectWrap" style="display:none;margin-bottom:10px;"><div class="section-lbl">Options</div><input id="ecOpts" placeholder="opt1, opt2…"></div>
+    <div id="ecFormulaWrap" style="display:none;margin-bottom:10px;">
+      <div class="section-lbl">Formula</div>
+      <div class="fb-preview" id="ecFormulaDisplay" style="margin-bottom:6px;">—</div>
+      <input type="hidden" id="ecFormula">
+      <button class="btn btn-purple btn-sm" onclick="openFormulaBuilder('editcol')">∑ Open Builder</button>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeEditCol()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveEditCol()">✓ Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Load Template Modal -->
+<div class="modal-bg" id="loadTplModal">
+  <div class="modal">
+    <h3>Load Template</h3>
+    <p style="font-size:13px;color:var(--text2);margin-bottom:12px;">This will <strong style="color:var(--accent3)">replace</strong> your current column groups.</p>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="document.getElementById('loadTplModal').classList.remove('show')">Cancel</button>
+      <button class="btn btn-primary" id="loadTplConfirm">Load</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════════════
+//  DATA MODEL
+//  groups: [{id, name, cols:[{id,name,type,options,formula}]}]
+//  rows:   [{id, cells:{colId:val}}]
+// ═══════════════════════════════════════════════════
+let groups    = [];
+let rows      = [];
+let templates = {};
+let editingRowId = null;
+let searchQuery  = '';
+
+// Formula builder state
+let fbTargetType = null;  // 'newcol' | 'editcol' | colId
+let fbBuffer = '';
+
+// Import state
+let importData = null;
+
+// Edit col state
+let editingColId  = null;
+let editingColGid = null;
+
+// ── init ──
+window.onload = () => { loadStorage(); renderAll(); };
+
+function loadStorage() {
+  groups    = JSON.parse(localStorage.getItem('mep3_groups')    || '[]');
+  rows      = JSON.parse(localStorage.getItem('mep3_rows')      || '[]');
+  templates = JSON.parse(localStorage.getItem('mep3_templates') || '{}');
+  // migrate old format
+  if (!groups.length) {
+    const oldCols = JSON.parse(localStorage.getItem('mep_columns') || '[]');
+    if (oldCols.length) {
+      groups = [{id:uid(), name:'General', cols:oldCols}];
+    } else {
+      groups = [
+        {id:uid(), name:'Project Info', cols:[
+          {id:uid(),name:'Project ID',type:'text',options:[],formula:''},
+          {id:uid(),name:'Description',type:'text',options:[],formula:''},
+          {id:uid(),name:'Status',type:'select',options:['Pending','In Progress','Completed','On Hold'],formula:''},
+          {id:uid(),name:'Date',type:'date',options:[],formula:''},
+        ]},
+        {id:uid(), name:'Boiler Structure', cols:[
+          {id:uid(),name:'COLUMN',type:'number',options:[],formula:''},
+          {id:uid(),name:'BEAM',type:'number',options:[],formula:''},
+          {id:uid(),name:'BRACING',type:'number',options:[],formula:''},
+          {id:uid(),name:'Estimation Kgs',type:'number',options:[],formula:''},
+          {id:uid(),name:'BAAN Kgs',type:'number',options:[],formula:''},
+          {id:uid(),name:'Over/Saving MT',type:'formula',options:[],formula:'([Estimation Kgs]-[BAAN Kgs])/1000'},
+        ]},
+      ];
+    }
+    save();
+  }
+  allCols().forEach(c => { if (!c.formula) c.formula=''; });
+}
+
+function save() {
+  localStorage.setItem('mep3_groups',    JSON.stringify(groups));
+  localStorage.setItem('mep3_rows',      JSON.stringify(rows));
+  localStorage.setItem('mep3_templates', JSON.stringify(templates));
+}
+
+function uid() { return '_'+Math.random().toString(36).substr(2,9); }
+function allCols() { return groups.flatMap(g=>g.cols); }
+function findCol(id) { for (const g of groups) { const c=g.cols.find(x=>x.id===id); if(c) return {col:c,group:g}; } return null; }
+
+// ═══════════════════════════════════════════════════
+//  TABS
+// ═══════════════════════════════════════════════════
+function switchTab(name) {
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  document.querySelector(`.tab-btn[onclick*="${name}"]`).classList.add('active');
+  if (name==='entry')     renderAll();
+  if (name==='columns')   renderColumnSetup();
+  if (name==='formulas')  renderFormulaManager();
+  if (name==='templates') renderTemplates();
+}
+
+// ═══════════════════════════════════════════════════
+//  FORMULA ENGINE
+// ═══════════════════════════════════════════════════
+function evalFormula(formula, row) {
+  if (!formula||!formula.trim()) return null;
+  try {
+    let expr = formula.replace(/\[([^\]]+)\]/g, (_,nm)=>{
+      const found = allCols().find(c=>c.name===nm);
+      if (!found) return '0';
+      if (found.type==='formula') return evalFormula(found.formula,row)??0;
+      return parseFloat(row.cells[found.id]||0)||0;
+    });
+    expr = expr.replace(/×/g,'*').replace(/÷/g,'/').replace(/−/g,'-');
+    expr = expr.replace(/SUM\(([^)]+)\)/g,(_,a)=>a.split(',').map(x=>parseFloat(x)||0).reduce((a,b)=>a+b,0));
+    expr = expr.replace(/AVG\(([^)]+)\)/g,(_,a)=>{const p=a.split(',').map(x=>parseFloat(x)||0);return p.reduce((a,b)=>a+b,0)/p.length;});
+    if (!/^[\d\s+\-*/().,%]*$/.test(expr)) return null;
+    const r = Function('"use strict";return ('+expr+')')();
+    return isFinite(r) ? r : null;
+  } catch { return null; }
+}
+
+// ═══════════════════════════════════════════════════
+//  RENDER — DATA TABLE
+// ═══════════════════════════════════════════════════
+function renderAll() { renderTableHead(); renderTableBody(); renderStats(); }
+
+function renderStats() {
+  const fmtCols = allCols().filter(c=>c.type==='number'||c.type==='formula');
+  let html=`
+    <div class="stat-card"><div class="stat-lbl">Total Rows</div><div class="stat-val blue">${rows.length}</div></div>
+    <div class="stat-card"><div class="stat-lbl">Groups</div><div class="stat-val">${groups.length}</div></div>
+    <div class="stat-card"><div class="stat-lbl">Columns</div><div class="stat-val">${allCols().length}</div></div>
+  `;
+  fmtCols.slice(0,2).forEach(c=>{
+    const sum=rows.reduce((a,r)=>{
+      const v=c.type==='formula'?evalFormula(c.formula,r):parseFloat(r.cells[c.id]||0);
+      return a+(isNaN(v)?0:v);
+    },0);
+    html+=`<div class="stat-card"><div class="stat-lbl">${c.name}</div><div class="stat-val green">${sum.toLocaleString(undefined,{maximumFractionDigits:2})}</div></div>`;
+  });
+  document.getElementById('statsBar').innerHTML=html;
+}
+
+function renderTableHead() {
+  const head=document.getElementById('tHead');
+  // Row 1: group headers
+  let gr1='<tr class="group-row"><th class="no-group num-th">#</th>';
+  // Row 2: sub-column headers
+  let gr2='<tr class="sub-row"><th class="num-th">#</th>';
+
+  // Track column group borders
+  const groupBorderCols = new Set();
+  groups.forEach(g => {
+    if (g.cols.length===0) return;
+    const lastCol = g.cols[g.cols.length-1];
+    groupBorderCols.add(lastCol.id);
+    gr1+=`<th colspan="${g.cols.length}" title="${g.name}">${g.name}</th>`;
+    g.cols.forEach(c=>{
+      const icon={text:'T',number:'#',date:'📅',select:'▾',formula:'∑'}[c.type]||'T';
+      const isLast=c.id===lastCol.id;
+      gr2+=`<th class="${c.type==='formula'?'formula-th':''}" style="${isLast?'border-right:1px solid var(--border-active)':''}" title="${c.name}"><span style="opacity:.45;font-size:9px">${icon} </span>${c.name}</th>`;
+    });
+  });
+  gr1+='<th class="no-group" style="width:64px">Act.</th></tr>';
+  gr2+='<th class="act-th">—</th></tr>';
+  head.innerHTML=gr1+gr2;
+}
+
+function renderTableBody() {
+  const tbody=document.getElementById('tBody');
+  const q=searchQuery.toLowerCase().trim();
+  let visible=rows;
+  if(q) visible=rows.filter(r=>allCols().some(c=>{
+    const v=c.type==='formula'?String(evalFormula(c.formula,r)??''):String(r.cells[c.id]||'');
+    return v.toLowerCase().includes(q);
+  }));
+  document.getElementById('recCount').textContent=q?`${visible.length} of ${rows.length} rows`:`${rows.length} rows`;
+
+  if(!allCols().length){tbody.innerHTML=`<tr><td colspan="99"><div class="empty-state"><div class="ei">⚙</div><p>No columns. Go to <strong>Column Setup</strong>.</p></div></td></tr>`;return;}
+  if(!visible.length){tbody.innerHTML=`<tr><td colspan="${allCols().length+2}"><div class="empty-state"><div class="ei">${q?'🔍':'📋'}</div><p>${q?'No matches found.':'Click <strong>+ Add Row</strong> to begin.'}</p></div></td></tr>`;return;}
+
+  const visIds=new Set(visible.map(r=>r.id));
+  let idx=1,html='';
+  rows.forEach(r=>{
+    if(!visIds.has(r.id))return;
+    const isEdit=editingRowId===r.id;
+    html+=`<tr id="row_${r.id}" class="${isEdit?'editing':''}${q?' highlighted':''}"><td class="num-td">${idx++}</td>`;
+    groups.forEach((g,gi)=>{
+      g.cols.forEach((c,ci)=>{
+        const isLastInGroup=ci===g.cols.length-1;
+        const borderCls=isLastInGroup&&gi<groups.length-1?'group-border':'';
+        if(c.type==='formula'){
+          const res=evalFormula(c.formula,r);
+          const disp=res===null||isNaN(res)?'—':Number(res.toFixed(4)).toLocaleString();
+          html+=`<td class="formula-cell ${borderCls}" title="${c.formula}">${disp}</td>`;
+        } else if(isEdit){
+          html+=`<td class="${borderCls}">${buildInp(c,r.cells[c.id]||'',r.id)}</td>`;
+        } else {
+          const val=r.cells[c.id]||'';
+          html+=`<td class="${borderCls}" title="${val}">${val}</td>`;
+        }
+      });
+    });
+    if(isEdit){
+      html+=`<td class="act-td"><button class="btn-icon" onclick="saveRow('${r.id}')" title="Save">✓</button><button class="btn-icon del" onclick="cancelEdit('${r.id}')" title="Cancel">✕</button></td>`;
+    } else {
+      html+=`<td class="act-td"><button class="btn-icon" onclick="editRow('${r.id}')" title="Edit">✏</button><button class="btn-icon del" onclick="deleteRow('${r.id}')" title="Delete">🗑</button></td>`;
+    }
+    html+='</tr>';
+  });
+  tbody.innerHTML=html;
+}
+
+function buildInp(col,val,rowId){
+  const id=`inp_${rowId}_${col.id}`;
+  if(col.type==='select'&&col.options.length){
+    return `<select id="${id}"><option value=""></option>${col.options.map(o=>`<option${val===o?' selected':''}>${o}</option>`).join('')}</select>`;
+  }
+  if(col.type==='date') return `<input type="date" id="${id}" value="${val}">`;
+  if(col.type==='number') return `<input type="number" id="${id}" value="${val}" step="any">`;
+  return `<input type="text" id="${id}" value="${val}" onkeydown="if(event.key==='Enter')saveRow('${rowId}')">`;
+}
+
+// ═══════════════════════════════════════════════════
+//  ROW OPS
+// ═══════════════════════════════════════════════════
+function addNewRow(){
+  if(!allCols().length){showToast('Add columns first','error');switchTab('columns');return;}
+  const r={id:uid(),cells:{}};
+  allCols().forEach(c=>r.cells[c.id]='');
+  rows.push(r); editingRowId=r.id; save(); renderTableBody(); renderStats();
+  const wrap=document.querySelector('.table-wrap'); wrap.scrollTop=wrap.scrollHeight;
+  setTimeout(()=>{const f=document.querySelector(`#row_${r.id} td input,#row_${r.id} td select`);if(f)f.focus();},60);
+}
+function editRow(id){if(editingRowId&&editingRowId!==id)saveRow(editingRowId);editingRowId=id;renderTableBody();setTimeout(()=>{const f=document.querySelector(`#row_${id} td input,#row_${id} td select`);if(f)f.focus();},60);}
+function saveRow(id){
+  const row=rows.find(r=>r.id===id);if(!row)return;
+  allCols().filter(c=>c.type!=='formula').forEach(c=>{const el=document.getElementById(`inp_${id}_${c.id}`);if(el)row.cells[c.id]=el.value;});
+  editingRowId=null;save();renderTableBody();renderStats();showToast('Row saved!','success');
+}
+function cancelEdit(id){
+  const row=rows.find(r=>r.id===id);
+  if(row&&allCols().filter(c=>c.type!=='formula').every(c=>!row.cells[c.id])){rows=rows.filter(r=>r.id!==id);save();}
+  editingRowId=null;renderTableBody();
+}
+function deleteRow(id){if(!confirm('Delete this row?'))return;rows=rows.filter(r=>r.id!==id);save();renderTableBody();renderStats();showToast('Row deleted','info');}
+function filterRows(){searchQuery=document.getElementById('searchInput').value;renderTableBody();}
+function clearSearch(){document.getElementById('searchInput').value='';searchQuery='';renderTableBody();}
+
+// ═══════════════════════════════════════════════════
+//  COLUMN SETUP
+// ═══════════════════════════════════════════════════
+function renderColumnSetup(){
+  // Group list
+  const gl=document.getElementById('groupList');
+  if(!groups.length){gl.innerHTML='<div style="font-size:12px;color:var(--text3)">No groups yet.</div>';return;}
+  gl.innerHTML=groups.map(g=>`
+    <div class="group-item">
+      <div class="group-hdr" onclick="toggleGroup('${g.id}')">
+        <span class="group-toggle" id="gt_${g.id}">▶</span>
+        <span class="group-name">${g.name}</span>
+        <span class="group-badge">${g.cols.length} cols</span>
+        <button class="btn-icon del btn-sm" style="margin-left:auto" onclick="event.stopPropagation();removeGroup('${g.id}')" title="Delete group">🗑</button>
+      </div>
+      <div class="group-cols" id="gc_${g.id}">
+        ${g.cols.map(c=>`
+          <div class="col-row-item">
+            <span class="col-chip-name">${c.name}</span>
+            <span class="type-pill tp-${c.type}">${c.type}</span>
+            ${c.type==='formula'?`<span class="type-pill" style="background:var(--purple-dim);color:var(--purple)" title="${c.formula}">∑</span>`:''}
+            <button class="btn-icon btn-sm" onclick="openEditCol('${g.id}','${c.id}')" title="Edit">✏</button>
+            <button class="btn-icon del btn-sm" onclick="removeCol('${g.id}','${c.id}')" title="Remove">×</button>
+          </div>`).join('')}
+        ${!g.cols.length?'<div style="font-size:11px;color:var(--text3);padding:4px 0">No columns in this group</div>':''}
+      </div>
+    </div>`).join('');
+
+  // Populate group dropdown
+  const sel=document.getElementById('addColGroup');
+  sel.innerHTML=groups.map(g=>`<option value="${g.id}">${g.name}</option>`).join('');
+}
+
+function toggleGroup(id){
+  const gc=document.getElementById('gc_'+id);
+  const gt=document.getElementById('gt_'+id);
+  gc.classList.toggle('open');
+  gt.classList.toggle('open');
+}
+
+function addGroup(){
+  const name=document.getElementById('newGroupName').value.trim();
+  if(!name){showToast('Enter group name','error');return;}
+  groups.push({id:uid(),name,cols:[]});
+  document.getElementById('newGroupName').value='';
+  save();renderColumnSetup();showToast(`Group "${name}" added`,'success');
+}
+
+function removeGroup(id){
+  const g=groups.find(x=>x.id===id);
+  if(!confirm(`Remove group "${g.name}" and all its columns?`))return;
+  const colIds=new Set(g.cols.map(c=>c.id));
+  groups=groups.filter(x=>x.id!==id);
+  rows.forEach(r=>colIds.forEach(cid=>delete r.cells[cid]));
+  save();renderColumnSetup();showToast(`Group removed`,'info');
+}
+
+function onNewColTypeChange(){
+  const t=document.getElementById('newColType').value;
+  document.getElementById('newColSelectOpts').style.display=t==='select'?'inline-block':'none';
+  document.getElementById('newColFormulaRow').style.display=t==='formula'?'block':'none';
+}
+
+function addColumnToGroup(){
+  const gid=document.getElementById('addColGroup').value;
+  const name=document.getElementById('newColName').value.trim();
+  if(!name){showToast('Enter column name','error');return;}
+  const g=groups.find(x=>x.id===gid);
+  if(!g){showToast('Select a group','error');return;}
+  if(allCols().find(c=>c.name.toLowerCase()===name.toLowerCase())){showToast('Column name exists','error');return;}
+  const type=document.getElementById('newColType').value;
+  const opts=type==='select'?document.getElementById('newColSelectOpts').value.split(',').map(s=>s.trim()).filter(Boolean):[];
+  const formula=type==='formula'?document.getElementById('newColFormula').value:'';
+  const col={id:uid(),name,type,options:opts,formula};
+  g.cols.push(col);
+  rows.forEach(r=>r.cells[col.id]='');
+  document.getElementById('newColName').value='';
+  document.getElementById('newColFormula').value='';
+  save();renderColumnSetup();renderAll();
+  showToast(`Column "${name}" added to "${g.name}"`,'success');
+}
+
+function removeCol(gid,cid){
+  const g=groups.find(x=>x.id===gid);
+  const c=g.cols.find(x=>x.id===cid);
+  if(!confirm(`Remove column "${c.name}"?`))return;
+  g.cols=g.cols.filter(x=>x.id!==cid);
+  rows.forEach(r=>delete r.cells[cid]);
+  save();renderColumnSetup();renderAll();showToast('Column removed','info');
+}
+
+// Edit column modal
+function openEditCol(gid,cid){
+  editingColId=cid; editingColGid=gid;
+  const g=groups.find(x=>x.id===gid);
+  const c=g.cols.find(x=>x.id===cid);
+  document.getElementById('ecName').value=c.name;
+  document.getElementById('ecType').value=c.type;
+  document.getElementById('ecOpts').value=(c.options||[]).join(', ');
+  document.getElementById('ecFormula').value=c.formula||'';
+  document.getElementById('ecFormulaDisplay').textContent=c.formula||'—';
+  onEcTypeChange();
+  document.getElementById('editColModal').classList.add('show');
+}
+function onEcTypeChange(){
+  const t=document.getElementById('ecType').value;
+  document.getElementById('ecSelectWrap').style.display=t==='select'?'block':'none';
+  document.getElementById('ecFormulaWrap').style.display=t==='formula'?'block':'none';
+}
+function saveEditCol(){
+  const g=groups.find(x=>x.id===editingColGid);
+  const c=g.cols.find(x=>x.id===editingColId);
+  c.name=document.getElementById('ecName').value.trim()||c.name;
+  c.type=document.getElementById('ecType').value;
+  c.options=c.type==='select'?document.getElementById('ecOpts').value.split(',').map(s=>s.trim()).filter(Boolean):[];
+  c.formula=c.type==='formula'?document.getElementById('ecFormula').value:'';
+  save();closeEditCol();renderColumnSetup();renderAll();showToast('Column updated','success');
+}
+function closeEditCol(){document.getElementById('editColModal').classList.remove('show');}
+
+// ═══════════════════════════════════════════════════
+//  FORMULA MANAGER
+// ═══════════════════════════════════════════════════
+let selectedFmColId = null;
+
+function renderFormulaManager(){
+  const list=document.getElementById('fmList');
+  const formulaCols=allCols().filter(c=>c.type==='formula');
+  if(!formulaCols.length){
+    list.innerHTML='<div style="font-size:13px;color:var(--text3);">No formula columns yet. Add a column with type "Formula ∑" in Column Setup.</div>';
+  } else {
+    list.innerHTML=formulaCols.map(c=>{
+      const {group}=findCol(c.id)||{};
+      const isSelected=selectedFmColId===c.id;
+      return `
+      <div class="fm-item" style="${isSelected?'border-color:var(--purple);background:rgba(139,111,212,.08)':''}">
+        <div class="fm-item-hdr">
+          <span class="fm-col-name">${c.name}</span>
+          <span class="fm-group-tag">${group?group.name:''}</span>
+          <button class="btn btn-sm ${isSelected?'btn-purple':'btn-ghost'}" style="margin-left:auto" onclick="selectFmCol('${c.id}')">
+            ${isSelected?'✓ Selected':'Select to Edit'}
+          </button>
+        </div>
+        ${c.formula
+          ? `<div class="fm-formula-box" onclick="selectFmCol('${c.id}')" title="Click to select">${c.formula}</div>`
+          : `<div class="fm-no-formula">No formula set — select this column and use the builder →</div>`
+        }
+      </div>`;
+    }).join('');
+  }
+
+  // Populate formula builder column refs
+  const grid=document.getElementById('fbColGrid');
+  grid.innerHTML=allCols()
+    .filter(c=>c.type!=='formula'||(c.id!==selectedFmColId))
+    .map(c=>`<button class="fb-col-btn" onclick="fbAppend('[${c.name}]')" title="${c.name}">${c.name}</button>`)
+    .join('');
+
+  updateFbTarget();
+}
+
+function selectFmCol(id){
+  selectedFmColId=id;
+  const col=allCols().find(c=>c.id===id);
+  fbBuffer=col.formula||'';
+  document.getElementById('fbRawInput').value=fbBuffer;
+  updateFbPreview();
+  renderFormulaManager();
+}
+
+function updateFbTarget(){
+  const el=document.getElementById('fbTarget');
+  if(selectedFmColId){
+    const col=allCols().find(c=>c.id===selectedFmColId);
+    el.textContent=`Editing formula for: "${col?col.name:'?'}"`;
+    el.style.color='var(--accent2)';
+  } else {
+    el.textContent='Select a formula column above first';
+    el.style.color='var(--text3)';
+  }
+}
+
+function fbAppend(token){fbBuffer+=token;document.getElementById('fbRawInput').value=fbBuffer;updateFbPreview();}
+function onFbRaw(){fbBuffer=document.getElementById('fbRawInput').value;updateFbPreview();}
+function fbClear(){fbBuffer='';document.getElementById('fbRawInput').value='';updateFbPreview();}
+function updateFbPreview(){document.getElementById('fbPreview').textContent=fbBuffer||'—';}
+
+function fbApply(){
+  if(!selectedFmColId){showToast('Select a formula column first','error');return;}
+  const col=allCols().find(c=>c.id===selectedFmColId);
+  if(col){col.formula=fbBuffer.trim();save();renderFormulaManager();renderAll();showToast(`Formula applied to "${col.name}"`,'success');}
+}
+
+// formula builder from column setup / edit col
+function openFormulaBuilder(target){
+  fbTargetType=target;
+  if(target==='newcol') fbBuffer=document.getElementById('newColFormula').value;
+  else if(target==='editcol') fbBuffer=document.getElementById('ecFormula').value;
+  // switch to formula tab and select
+  switchTab('formulas');
+  // set buffer
+  document.getElementById('fbRawInput').value=fbBuffer;
+  updateFbPreview();
+  showToast('Use the builder then click Apply','info');
+  // override apply
+  const oldApply=document.querySelector('.tab-panel#tab-formulas .btn-primary[onclick="fbApply()"]');
+}
+
+// ═══════════════════════════════════════════════════
+//  EXCEL IMPORT
+// ═══════════════════════════════════════════════════
+function handleDrop(e){e.preventDefault();document.getElementById('importZone').classList.remove('drag-active');const f=e.dataTransfer.files[0];if(f)processFile(f);}
+function handleImportFile(e){const f=e.target.files[0];if(f)processFile(f);e.target.value='';}
+
+function colLetter(idx){ // 0-based
+  let s='';idx++;
+  while(idx>0){idx--;s=String.fromCharCode(65+(idx%26))+s;idx=Math.floor(idx/26);}
+  return s;
+}
+
+function excelFormulaToOurs(excelFormula, colMap){
+  // colMap: letterUpper -> colName
+  if(!excelFormula||!excelFormula.startsWith('='))return '';
+  let f=excelFormula.slice(1);
+  // replace cell refs: AK201 -> [ColName]
+  f=f.replace(/([A-Z]{1,3})\d+/g,(_,letter)=>{
+    const name=colMap[letter];
+    return name?`[${name}]`:letter;
+  });
+  f=f.replace(/AVERAGE\(/gi,'AVG(');
+  return f;
+}
+
+function processFile(file){
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{
+      const wb=XLSX.read(e.target.result,{type:'binary',cellFormula:true,cellDates:true});
+      const sheetName=wb.SheetNames[0];
+      const ws=wb.Sheets[sheetName];
+      const range=XLSX.utils.decode_range(ws['!ref']||'A1');
+
+      // ── Parse merged cells to find group spans ──
+      const mergedGroups=[]; // {name, minCol, maxCol}
+      // We'll use XLSX merged cell info
+      const merges=(ws['!merges'])||[];
+      merges.forEach(m=>{
+        if(m.s.r===0&&m.e.r===0&&m.e.c>m.s.c){
+          const cell=ws[XLSX.utils.encode_cell({r:0,c:m.s.c})];
+          if(cell&&cell.v){
+            mergedGroups.push({name:String(cell.v).replace(/\n/g,' ').trim(),minCol:m.s.c,maxCol:m.e.c});
+          }
+        }
+      });
+
+      // Also pick single-cell headers in row 1 that have values
+      const row1Singles={};
+      for(let c=range.s.c;c<=range.e.c;c++){
+        const cell=ws[XLSX.utils.encode_cell({r:0,c})];
+        if(cell&&cell.v){
+          const inGroup=mergedGroups.some(g=>c>=g.minCol&&c<=g.maxCol);
+          if(!inGroup) row1Singles[c]=String(cell.v).replace(/\n/g,' ').trim();
+        }
+      }
+
+      // ── Sub-headers (row 2) ──
+      const subHeaders={}; // colIdx -> name
+      for(let c=range.s.c;c<=range.e.c;c++){
+        const cell=ws[XLSX.utils.encode_cell({r:1,c})];
+        if(cell&&cell.v) subHeaders[c]=String(cell.v).replace(/\n/g,' ').trim();
+      }
+
+      // Build col letter map for formula conversion
+      const letterToName={};
+      for(let c=range.s.c;c<=range.e.c;c++){
+        const name=subHeaders[c]||row1Singles[c];
+        if(name) letterToName[colLetter(c)]=name;
+      }
+
+      // ── Detect formula columns ──
+      const formulaByCol={}; // colIdx -> formula string
+      for(let r=range.s.r+2;r<=Math.min(range.e.r,range.s.r+200);r++){
+        for(let c=range.s.c;c<=range.e.c;c++){
+          const cell=ws[XLSX.utils.encode_cell({r,c})];
+          if(cell&&cell.f&&!formulaByCol[c]){
+            formulaByCol[c]='='+cell.f;
+          }
+        }
+      }
+
+      // ── Detect column types ──
+      const typeByCol={};
+      for(let c=range.s.c;c<=range.e.c;c++){
+        if(formulaByCol[c]){typeByCol[c]='formula';continue;}
+        let nums=0,dates=0,total=0;
+        for(let r=range.s.r+2;r<=Math.min(range.e.r,range.s.r+10);r++){
+          const cell=ws[XLSX.utils.encode_cell({r,c})];
+          if(!cell||!cell.v)continue;
+          total++;
+          if(cell.t==='n')nums++;
+          if(cell.t==='d')dates++;
+        }
+        if(total>0&&nums/total>.6)typeByCol[c]='number';
+        else if(total>0&&dates/total>.6)typeByCol[c]='date';
+        else typeByCol[c]='text';
+      }
+
+      // ── Data rows ──
+      const dataRows=[];
+      for(let r=range.s.r+2;r<=range.e.r;r++){
+        const rowObj={};let hasAny=false;
+        for(let c=range.s.c;c<=range.e.c;c++){
+          const cell=ws[XLSX.utils.encode_cell({r,c})];
+          if(cell&&!cell.f&&cell.v!==undefined){rowObj[c]=String(cell.v);hasAny=true;}
+          else rowObj[c]='';
+        }
+        if(hasAny)dataRows.push(rowObj);
+      }
+
+      // Build import data structure
+      importData={
+        sheetName,fileName:file.name,
+        mergedGroups,row1Singles,subHeaders,
+        letterToName,formulaByCol,typeByCol,dataRows,
+        totalCols:Object.keys({...subHeaders,...row1Singles}).length,
+        totalRows:dataRows.length,
+        range
+      };
+
+      renderImportPreview();
+    }catch(err){showToast('Read error: '+err.message,'error');console.error(err);}
+  };
+  reader.readAsBinaryString(file);
+}
+
+function renderImportPreview(){
+  const {fileName,sheetName,mergedGroups,row1Singles,subHeaders,formulaByCol,totalRows}=importData;
+  document.getElementById('impFileName').textContent=fileName;
+  document.getElementById('impMeta').textContent=`Sheet: ${sheetName} · ${totalRows} data rows`;
+
+  const gl=document.getElementById('impGroupList');
+  let html='';
+
+  // Grouped columns
+  mergedGroups.forEach(g=>{
+    const cols=[];
+    for(let c=g.minCol;c<=g.maxCol;c++){
+      const name=subHeaders[c];
+      if(name)cols.push({idx:c,name,hasFormula:!!formulaByCol[c]});
+    }
+    if(!cols.length)return;
+    html+=`<div class="ig-item">
+      <div class="ig-hdr"><span class="ig-name">${g.name}</span><span style="font-size:11px;color:var(--text3);font-family:var(--mono)">${cols.length} sub-cols</span></div>
+      <div class="ig-sub-cols">
+        ${cols.map(col=>`
+          <label class="ig-col-check">
+            <input type="checkbox" id="ic_${col.idx}" checked>
+            ${col.name}${col.hasFormula?'<span class="fml-badge">∑</span>':''}
+          </label>`).join('')}
+      </div>
+    </div>`;
+  });
+
+  // Ungrouped cols
+  const ungroupedCols=Object.entries(row1Singles).map(([c,name])=>({idx:parseInt(c),name,hasFormula:!!formulaByCol[parseInt(c)]}));
+  if(ungroupedCols.length){
+    html+=`<div class="ig-item">
+      <div class="ig-hdr"><span class="ig-name">Single Columns</span></div>
+      <div class="ig-sub-cols">
+        ${ungroupedCols.map(col=>`
+          <label class="ig-col-check">
+            <input type="checkbox" id="ic_${col.idx}" checked>
+            ${col.name}${col.hasFormula?'<span class="fml-badge">∑</span>':''}
+          </label>`).join('')}
+      </div>
+    </div>`;
+  }
+
+  gl.innerHTML=html||'<div style="color:var(--text3);font-size:12px">No recognized column structure found</div>';
+  document.getElementById('importZone').style.display='none';
+  document.getElementById('importPreview').style.display='block';
+}
+
+function cancelImport(){
+  importData=null;
+  document.getElementById('importZone').style.display='block';
+  document.getElementById('importPreview').style.display='none';
+}
+
+function confirmImport(){
+  if(!importData)return;
+  const {mergedGroups,row1Singles,subHeaders,formulaByCol,letterToName,typeByCol,dataRows}=importData;
+  const withData=document.getElementById('impWithData').checked;
+  const withFormulas=document.getElementById('impWithFormulas').checked;
+  const append=document.getElementById('impAppend').checked;
+
+  if(!append){groups=[];rows=[];}
+
+  // Build groups from merged headers
+  mergedGroups.forEach(g=>{
+    const cols=[];
+    for(let c=g.minCol;c<=g.maxCol;c++){
+      const name=subHeaders[c];
+      if(!name)continue;
+      const el=document.getElementById('ic_'+c);
+      if(el&&!el.checked)continue;
+      const hasF=withFormulas&&formulaByCol[c];
+      const type=hasF?'formula':typeByCol[c]||'text';
+      const formula=hasF?excelFormulaToOurs(formulaByCol[c],letterToName):'';
+      cols.push({id:uid(),name,type,options:[],formula});
+    }
+    if(!cols.length)return;
+    const existing=groups.find(x=>x.name===g.name);
+    if(existing){
+      cols.forEach(nc=>{if(!existing.cols.find(ec=>ec.name===nc.name))existing.cols.push(nc);});
+    } else {
+      groups.push({id:uid(),name:g.name,cols});
+    }
+  });
+
+  // Ungrouped
+  const singleCols=[];
+  Object.entries(row1Singles).forEach(([ci,name])=>{
+    const c=parseInt(ci);
+    const el=document.getElementById('ic_'+c);
+    if(el&&!el.checked)return;
+    const hasF=withFormulas&&formulaByCol[c];
+    const type=hasF?'formula':typeByCol[c]||'text';
+    const formula=hasF?excelFormulaToOurs(formulaByCol[c],letterToName):'';
+    singleCols.push({id:uid(),name,type,options:[],formula});
+  });
+  if(singleCols.length){
+    let sg=groups.find(g=>g.name==='General');
+    if(!sg){sg={id:uid(),name:'General',cols:[]};groups.push(sg);}
+    singleCols.forEach(c=>{if(!sg.cols.find(ec=>ec.name===c.name))sg.cols.push(c);});
+  }
+
+  // Ensure all rows have cells for new cols
+  const allNewCols=allCols();
+  rows.forEach(r=>allNewCols.forEach(c=>{if(!(c.id in r.cells))r.cells[c.id]='';}));
+
+  // Import data rows
+  if(withData){
+    // Build name→colId map
+    const nameToCol={};
+    allNewCols.forEach(c=>nameToCol[c.name]=c);
+
+    dataRows.forEach(dataRow=>{
+      const cells={};
+      allNewCols.forEach(c=>cells[c.id]='');
+      // Map by position: subHeaders[colIdx] -> name -> col
+      Object.entries({...dataRow}).forEach(([ci,val])=>{
+        const c=parseInt(ci);
+        const name=subHeaders[c]||row1Singles[c];
+        if(!name)return;
+        const col=nameToCol[name];
+        if(col&&col.type!=='formula')cells[col.id]=val;
+      });
+      rows.push({id:uid(),cells});
+    });
+  }
+
+  save();
+  cancelImport();
+  switchTab('entry');
+  showToast(`Imported ${groups.length} groups, ${allCols().length} cols${withData?', '+dataRows.length+' rows':''}!`,'success');
+}
+
+// ═══════════════════════════════════════════════════
+//  TEMPLATES
+// ═══════════════════════════════════════════════════
+function saveTpl(){
+  const name=document.getElementById('tplName').value.trim();
+  if(!name){showToast('Enter name','error');return;}
+  if(!groups.length){showToast('No columns to save','error');return;}
+  templates[name]=JSON.parse(JSON.stringify(groups));
+  document.getElementById('tplName').value='';
+  save();renderTemplates();showToast(`Template "${name}" saved`,'success');
+}
+
+function renderTemplates(){
+  const el=document.getElementById('tplList');
+  const names=Object.keys(templates);
+  if(!names.length){el.innerHTML='<div style="font-size:13px;color:var(--text3)">No templates yet.</div>';return;}
+  el.innerHTML=names.map(name=>{
+    const gs=templates[name];
+    const totalCols=gs.reduce((a,g)=>a+g.cols.length,0);
+    const fCols=gs.flatMap(g=>g.cols).filter(c=>c.type==='formula').length;
+    return `<div class="tpl-item">
+      <div class="tpl-info">
+        <div class="tpl-name">${name}</div>
+        <div class="tpl-meta">${gs.length} groups · ${totalCols} cols${fCols?` · ${fCols} formulas`:''}</div>
+      </div>
+      <button class="btn btn-primary btn-sm" onclick="loadTpl('${name}')">Load</button>
+      <button class="btn btn-danger btn-sm" onclick="deleteTpl('${name}')">Del</button>
+    </div>`;
+  }).join('');
+}
+
+function loadTpl(name){
+  document.getElementById('loadTplConfirm').onclick=()=>{
+    groups=JSON.parse(JSON.stringify(templates[name]));
+    const newIds=new Set(allCols().map(c=>c.id));
+    rows.forEach(r=>{Object.keys(r.cells).forEach(k=>{if(!newIds.has(k))delete r.cells[k];});});
+    allCols().forEach(c=>rows.forEach(r=>{if(!(c.id in r.cells))r.cells[c.id]='';}));
+    save();document.getElementById('loadTplModal').classList.remove('show');
+    switchTab('entry');showToast(`Template "${name}" loaded`,'success');
+  };
+  document.getElementById('loadTplModal').classList.add('show');
+}
+
+function deleteTpl(name){if(!confirm(`Delete "${name}"?`))return;delete templates[name];save();renderTemplates();showToast('Deleted','info');}
+
+// ═══════════════════════════════════════════════════
+//  EXPORT
+// ═══════════════════════════════════════════════════
+function exportToExcel(){
+  if(!rows.length){showToast('No data to export','error');return;}
+  const cols=allCols();
+  const header=cols.map(c=>c.name);
+  const data=[header,...rows.map(r=>cols.map(c=>{
+    if(c.type==='formula'){const v=evalFormula(c.formula,r);return v===null?'':v;}
+    const v=r.cells[c.id]||'';
+    return c.type==='number'?(parseFloat(v)||''):v;
+  }))];
+  const ws=XLSX.utils.aoa_to_sheet(data);
+  ws['!cols']=cols.map(()=>({wch:16}));
+  const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,'Data');
+  XLSX.writeFile(wb,`MechEntry_${new Date().toISOString().split('T')[0]}.xlsx`);
+  showToast('Excel exported!','success');
+}
+
+// ═══════════════════════════════════════════════════
+//  UTILS
+// ═══════════════════════════════════════════════════
+function clearAllData(){if(!confirm('Clear ALL rows?'))return;rows=[];editingRowId=null;save();renderAll();showToast('Rows cleared','info');}
+
+let tTimer;
+function showToast(msg,type='info'){
+  const icons={success:'✓',error:'✕',info:'ℹ'};
+  const t=document.getElementById('toast');
+  t.className=`show ${type}`;
+  t.innerHTML=`<span>${icons[type]||'ℹ'}</span>${msg}`;
+  clearTimeout(tTimer);tTimer=setTimeout(()=>t.className='',3000);
+}
+
+// Close modals on bg click
+['editColModal','loadTplModal'].forEach(id=>{
+  document.getElementById(id).addEventListener('click',e=>{if(e.target===e.currentTarget)e.target.classList.remove('show');});
+});
+</script>
+</body>
+</html>
