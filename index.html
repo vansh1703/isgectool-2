@@ -3,23 +3,22 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MechEntry Pro v3</title>
+<title>MechEntry Pro v4</title>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
 :root {
-  --bg:#0d0f14; --surface:#13161e; --surface2:#1a1e2a; --surface3:#222736;
-  --border:#2a3045; --border-active:#3d4f7a;
-  --accent:#4f8ef7; --accent2:#38d9a9; --accent3:#f7c94f;
-  --danger:#f76f6f; --purple:#8b6fd4; --purple-dim:rgba(139,111,212,.15);
-  --text:#e8eaf0; --text2:#8a93b0; --text3:#545d7a;
-  --mono:'IBM Plex Mono',monospace; --sans:'IBM Plex Sans',sans-serif;
-  --r:6px; --shadow:0 4px 24px rgba(0,0,0,.45);
+  --bg:#0d0f14;--surface:#13161e;--surface2:#1a1e2a;--surface3:#222736;
+  --border:#2a3045;--border-active:#3d4f7a;
+  --accent:#4f8ef7;--accent2:#38d9a9;--accent3:#f7c94f;
+  --danger:#f76f6f;--purple:#8b6fd4;--purple-dim:rgba(139,111,212,.15);
+  --text:#e8eaf0;--text2:#8a93b0;--text3:#545d7a;
+  --mono:'IBM Plex Mono',monospace;--sans:'IBM Plex Sans',sans-serif;
+  --r:6px;--shadow:0 4px 24px rgba(0,0,0,.45);
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;}
 
-/* HEADER */
 header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 20px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200;}
 .logo{display:flex;align-items:center;gap:10px;}
 .logo-icon{width:30px;height:30px;background:var(--accent);border-radius:6px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:13px;font-weight:700;color:#fff;}
@@ -27,18 +26,15 @@ header{background:var(--surface);border-bottom:1px solid var(--border);padding:0
 .logo-sub{font-size:10px;color:var(--text2);font-family:var(--mono);}
 .hdr-btns{display:flex;gap:6px;align-items:center;}
 
-/* TABS */
 .tabs{background:var(--surface);border-bottom:1px solid var(--border);padding:0 20px;display:flex;overflow-x:auto;}
 .tab-btn{padding:9px 18px;font-size:13px;font-weight:500;color:var(--text2);background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap;transition:all .15s;}
 .tab-btn:hover{color:var(--text);}
 .tab-btn.active{color:var(--accent);border-bottom-color:var(--accent);}
 
-/* MAIN */
 main{flex:1;padding:16px 20px;overflow:hidden;}
 .tab-panel{display:none;height:100%;}
 .tab-panel.active{display:flex;flex-direction:column;}
 
-/* BUTTONS */
 .btn{display:inline-flex;align-items:center;gap:5px;padding:6px 13px;border-radius:var(--r);border:1px solid transparent;font-family:var(--sans);font-size:13px;font-weight:500;cursor:pointer;transition:all .15s;white-space:nowrap;}
 .btn-primary{background:var(--accent);color:#fff;}
 .btn-primary:hover{background:#3a7be0;}
@@ -57,13 +53,11 @@ main{flex:1;padding:16px 20px;overflow:hidden;}
 .btn-icon:hover{border-color:var(--border-active);color:var(--text);}
 .btn-icon.del:hover{border-color:var(--danger);color:var(--danger);}
 
-/* INPUTS */
 input,select,textarea{background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:var(--r);font-family:var(--sans);font-size:13px;padding:6px 10px;outline:none;transition:border .15s;width:100%;}
 input:focus,select:focus,textarea:focus{border-color:var(--accent);}
 input::placeholder{color:var(--text3);}
 select option{background:var(--surface2);}
 
-/* STATS */
 .stats-bar{display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap;flex-shrink:0;}
 .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 14px;flex:1;min-width:110px;}
 .stat-lbl{font-size:10px;font-family:var(--mono);color:var(--text3);text-transform:uppercase;letter-spacing:.06em;}
@@ -71,42 +65,31 @@ select option{background:var(--surface2);}
 .stat-val.blue{color:var(--accent);}
 .stat-val.green{color:var(--accent2);}
 
-/* TOOLBAR */
+/* ── SEARCH BAR ── */
 .toolbar{display:flex;gap:8px;align-items:center;margin-bottom:10px;flex-wrap:wrap;flex-shrink:0;}
-.search-box{position:relative;flex:1;min-width:160px;max-width:300px;}
-.search-box input{padding-left:30px;}
-.search-box .si{position:absolute;left:9px;top:50%;transform:translateY(-50%);color:var(--text3);font-size:13px;pointer-events:none;}
+.search-wrap{position:relative;display:flex;align-items:center;gap:0;}
+.search-col-btn{background:var(--surface3);border:1px solid var(--border);border-right:none;border-radius:var(--r) 0 0 var(--r);padding:6px 10px;font-size:12px;color:var(--accent3);font-family:var(--mono);cursor:pointer;white-space:nowrap;height:32px;display:flex;align-items:center;gap:4px;transition:all .15s;}
+.search-col-btn:hover{border-color:var(--accent3);}
+.search-col-btn.has-col{background:rgba(247,201,79,.1);color:var(--accent3);}
+.search-inp{border-radius:0 var(--r) var(--r) 0;height:32px;min-width:180px;}
+.search-dropdown{position:absolute;top:calc(100% + 4px);left:0;background:var(--surface2);border:1px solid var(--border-active);border-radius:var(--r);min-width:220px;max-height:260px;overflow-y:auto;z-index:100;box-shadow:var(--shadow);display:none;}
+.search-dropdown.open{display:block;}
+.sd-item{padding:7px 12px;font-size:12px;cursor:pointer;font-family:var(--mono);color:var(--text2);display:flex;justify-content:space-between;align-items:center;}
+.sd-item:hover{background:rgba(79,142,247,.1);color:var(--text);}
+.sd-item.active{color:var(--accent3);background:rgba(247,201,79,.08);}
+.sd-item.all{color:var(--accent);font-weight:600;}
+.sd-group{padding:3px 12px;font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;font-family:var(--mono);background:var(--surface3);border-top:1px solid var(--border);}
 .rec-count{font-size:11px;font-family:var(--mono);color:var(--text3);}
 
-/* ═══════════════════════════════════════
-   GROUPED TABLE
-═══════════════════════════════════════ */
 .table-wrap{overflow:auto;border-radius:8px;border:1px solid var(--border);flex:1;min-height:0;}
 .table-wrap::-webkit-scrollbar{width:6px;height:6px;}
 .table-wrap::-webkit-scrollbar-track{background:var(--surface);}
 .table-wrap::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
 
 table{border-collapse:collapse;font-size:12px;white-space:nowrap;}
-/* Group header row */
-thead tr.group-row th{
-  background:var(--surface3);
-  border-bottom:1px solid var(--border);
-  border-right:1px solid var(--border-active);
-  font-family:var(--mono);font-size:10px;font-weight:700;
-  color:var(--accent3);text-transform:uppercase;letter-spacing:.05em;
-  padding:5px 10px;text-align:center;position:sticky;top:0;z-index:20;
-}
+thead tr.group-row th{background:var(--surface3);border-bottom:1px solid var(--border);border-right:1px solid var(--border-active);font-family:var(--mono);font-size:10px;font-weight:700;color:var(--accent3);text-transform:uppercase;letter-spacing:.05em;padding:5px 10px;text-align:center;position:sticky;top:0;z-index:20;}
 thead tr.group-row th.no-group{background:var(--surface2);color:var(--text3);}
-/* Sub-header row */
-thead tr.sub-row th{
-  background:var(--surface2);
-  border-bottom:1px solid var(--border);
-  border-right:1px solid var(--border);
-  font-family:var(--mono);font-size:10px;font-weight:600;
-  color:var(--text2);text-transform:uppercase;letter-spacing:.04em;
-  padding:6px 10px;text-align:left;
-  position:sticky;top:28px;z-index:19;
-}
+thead tr.sub-row th{background:var(--surface2);border-bottom:1px solid var(--border);border-right:1px solid var(--border);font-family:var(--mono);font-size:10px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.04em;padding:6px 10px;text-align:left;position:sticky;top:28px;z-index:19;}
 thead tr.sub-row th.formula-th{color:var(--purple);}
 thead tr.sub-row th.act-th{text-align:center;width:64px;}
 thead tr.sub-row th.num-th{width:36px;color:var(--text3);}
@@ -116,6 +99,7 @@ tbody tr:last-child{border-bottom:none;}
 tbody tr:hover{background:rgba(255,255,255,.025);}
 tbody tr.editing{background:rgba(79,142,247,.06);}
 tbody tr.highlighted{background:rgba(56,217,169,.05);}
+tbody tr.match-row td.match-cell{background:rgba(247,201,79,.12);color:var(--accent3);}
 
 td{padding:6px 10px;border-right:1px solid rgba(42,48,69,.5);color:var(--text);max-width:180px;overflow:hidden;text-overflow:ellipsis;vertical-align:middle;}
 td.group-border{border-right:1px solid var(--border-active);}
@@ -130,19 +114,23 @@ td input[type=date]{max-width:130px;}
 .empty-state .ei{font-size:36px;margin-bottom:10px;}
 .empty-state p{font-size:13px;}
 
-/* ═══════════════════════════════════════
-   COLUMN SETUP
-═══════════════════════════════════════ */
+/* ── COLUMN SETUP ── */
 .setup-panel{display:flex;gap:14px;height:100%;min-height:0;}
 .setup-left{flex:1;min-width:0;display:flex;flex-direction:column;gap:12px;overflow-y:auto;}
 .setup-right{width:300px;flex-shrink:0;display:flex;flex-direction:column;gap:12px;overflow-y:auto;}
 .card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;}
 .card-title{font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.08em;font-family:var(--mono);margin-bottom:12px;}
 
-/* Group list */
-.group-item{background:var(--surface2);border:1px solid var(--border);border-radius:8px;margin-bottom:8px;overflow:hidden;}
+/* ── DRAG-DROP GROUPS ── */
+.group-list-container{display:flex;flex-direction:column;gap:6px;}
+.group-item{background:var(--surface2);border:1px solid var(--border);border-radius:8px;overflow:hidden;cursor:default;transition:box-shadow .15s,opacity .15s;}
+.group-item.dragging{opacity:.4;box-shadow:none;}
+.group-item.drag-over{border-color:var(--accent);box-shadow:0 0 0 2px rgba(79,142,247,.25);}
 .group-hdr{display:flex;align-items:center;gap:8px;padding:8px 12px;cursor:pointer;user-select:none;}
 .group-hdr:hover{background:rgba(255,255,255,.03);}
+.drag-handle{color:var(--text3);font-size:14px;cursor:grab;padding:2px 4px;border-radius:3px;flex-shrink:0;}
+.drag-handle:hover{color:var(--text2);background:rgba(255,255,255,.05);}
+.drag-handle:active{cursor:grabbing;}
 .group-name{font-weight:600;font-size:13px;flex:1;}
 .group-badge{font-size:10px;color:var(--text3);font-family:var(--mono);}
 .group-toggle{color:var(--text3);font-size:11px;transition:transform .2s;}
@@ -151,7 +139,14 @@ td input[type=date]{max-width:130px;}
 .group-cols.open{display:block;}
 .col-row-item{display:flex;align-items:center;gap:6px;padding:4px 0;border-bottom:1px solid rgba(42,48,69,.4);}
 .col-row-item:last-child{border-bottom:none;}
+
+/* Col drag-drop within groups */
+.col-row-item{cursor:grab;transition:opacity .15s;}
+.col-row-item.col-dragging{opacity:.35;}
+.col-row-item.col-drag-over{border-top:2px solid var(--accent);}
+
 .col-chip-name{flex:1;font-size:12px;font-family:var(--mono);overflow:hidden;text-overflow:ellipsis;}
+.col-drag-handle{color:var(--text3);font-size:12px;cursor:grab;flex-shrink:0;}
 .type-pill{font-size:9px;padding:1px 5px;border-radius:3px;text-transform:uppercase;font-family:var(--mono);}
 .tp-text{background:rgba(79,142,247,.15);color:var(--accent);}
 .tp-number{background:rgba(56,217,169,.15);color:var(--accent2);}
@@ -159,13 +154,10 @@ td input[type=date]{max-width:130px;}
 .tp-select{background:rgba(247,111,111,.15);color:var(--danger);}
 .tp-formula{background:var(--purple-dim);color:var(--purple);}
 
-/* Add fields */
 .field-row{display:flex;gap:6px;align-items:flex-start;flex-wrap:wrap;margin-bottom:8px;}
 .field-row input,.field-row select{max-width:160px;}
 
-/* ═══════════════════════════════════════
-   FORMULA MANAGER
-═══════════════════════════════════════ */
+/* ── FORMULA MANAGER ── */
 .fm-list{display:flex;flex-direction:column;gap:8px;margin-bottom:12px;max-height:260px;overflow-y:auto;}
 .fm-item{background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:10px 12px;}
 .fm-item-hdr{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
@@ -174,7 +166,6 @@ td input[type=date]{max-width:130px;}
 .fm-formula-box{font-family:var(--mono);font-size:12px;color:var(--accent3);background:var(--surface3);border-radius:4px;padding:5px 8px;word-break:break-all;cursor:text;}
 .fm-no-formula{font-size:12px;color:var(--text3);font-style:italic;}
 
-/* Formula builder */
 .fb-col-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:5px;max-height:130px;overflow-y:auto;margin:8px 0;}
 .fb-col-btn{background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:4px 7px;font-family:var(--mono);font-size:11px;cursor:pointer;color:var(--text2);text-align:left;transition:all .15s;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .fb-col-btn:hover{border-color:var(--accent);color:var(--accent);}
@@ -183,9 +174,7 @@ td input[type=date]{max-width:130px;}
 .fb-op:hover{border-color:var(--accent3);}
 .fb-preview{font-family:var(--mono);font-size:12px;color:var(--accent3);background:var(--surface3);border:1px solid var(--border-active);border-radius:var(--r);padding:7px 10px;min-height:32px;margin:6px 0;word-break:break-all;}
 
-/* ═══════════════════════════════════════
-   IMPORT
-═══════════════════════════════════════ */
+/* ── IMPORT ── */
 .import-zone{border:2px dashed var(--border);border-radius:10px;padding:36px 20px;text-align:center;cursor:pointer;transition:all .2s;margin-bottom:14px;}
 .import-zone:hover,.import-zone.drag-active{border-color:var(--accent);background:rgba(79,142,247,.04);}
 .import-zone h3{font-size:15px;margin:10px 0 5px;}
@@ -201,22 +190,22 @@ td input[type=date]{max-width:130px;}
 .ig-col-check input{width:auto;}
 .fml-badge{font-size:9px;padding:1px 4px;background:var(--purple-dim);color:var(--purple);border-radius:3px;font-family:var(--mono);}
 
-/* TOAST */
+/* import info box */
+.import-info{background:rgba(79,142,247,.08);border:1px solid rgba(79,142,247,.25);border-radius:6px;padding:10px 12px;margin-bottom:10px;font-size:12px;color:var(--accent);font-family:var(--mono);}
+.import-info b{color:var(--accent3);}
+
 #toast{position:fixed;bottom:20px;right:20px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);padding:9px 14px;font-size:13px;z-index:9999;display:flex;align-items:center;gap:7px;box-shadow:var(--shadow);transform:translateY(80px);opacity:0;transition:all .25s;max-width:340px;}
 #toast.show{transform:translateY(0);opacity:1;}
 #toast.success{border-color:var(--accent2);color:var(--accent2);}
 #toast.error{border-color:var(--danger);color:var(--danger);}
 #toast.info{border-color:var(--accent);color:var(--accent);}
 
-/* MODAL */
 .modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:300;align-items:center;justify-content:center;}
 .modal-bg.show{display:flex;}
 .modal{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:22px;width:min(520px,95vw);box-shadow:var(--shadow);max-height:92vh;overflow-y:auto;}
 .modal h3{font-size:15px;margin-bottom:14px;}
 .modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:14px;}
 .section-lbl{font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.07em;font-family:var(--mono);margin-bottom:6px;}
-
-/* Templates */
 .tpl-item{background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:12px;margin-bottom:8px;display:flex;align-items:center;gap:10px;}
 .tpl-info{flex:1;min-width:0;}
 .tpl-name{font-weight:600;font-size:13px;margin-bottom:2px;}
@@ -228,7 +217,7 @@ td input[type=date]{max-width:130px;}
 <header>
   <div class="logo">
     <div class="logo-icon">ME</div>
-    <div><div class="logo-text">MechEntry Pro</div><div class="logo-sub">v3 · Grouped Headers + Formula Manager</div></div>
+    <div><div class="logo-text">MechEntry Pro</div><div class="logo-sub">v4 · Column Filter + Drag & Drop</div></div>
   </div>
   <div class="hdr-btns">
     <button class="btn btn-success btn-sm" onclick="exportToExcel()">⬇ Export Excel</button>
@@ -246,11 +235,21 @@ td input[type=date]{max-width:130px;}
 
 <main>
 
-<!-- ══ DATA ENTRY ══ -->
+<!-- DATA ENTRY -->
 <div class="tab-panel active" id="tab-entry">
   <div class="stats-bar" id="statsBar"></div>
   <div class="toolbar">
-    <div class="search-box"><span class="si">🔍</span><input id="searchInput" placeholder="Search any value…" oninput="filterRows()"></div>
+    <!-- Smart search with column picker -->
+    <div class="search-wrap" id="searchWrap">
+      <button class="search-col-btn" id="searchColBtn" onclick="toggleSearchDropdown()">
+        <span id="searchColLabel">All Columns</span> ▾
+      </button>
+      <input class="search-inp" id="searchInput" placeholder="Search value…" oninput="filterRows()" onkeydown="onSearchKey(event)">
+      <div class="search-dropdown" id="searchDropdown">
+        <div class="sd-item all" onclick="setSearchCol(null)">🔍 All Columns</div>
+        <div id="sdColList"></div>
+      </div>
+    </div>
     <button class="btn btn-primary" onclick="addNewRow()">+ Add Row</button>
     <button class="btn btn-ghost btn-sm" onclick="clearSearch()">✕ Clear</button>
     <span class="rec-count" id="recCount"></span>
@@ -263,31 +262,25 @@ td input[type=date]{max-width:130px;}
   </div>
 </div>
 
-<!-- ══ COLUMN SETUP ══ -->
+<!-- COLUMN SETUP -->
 <div class="tab-panel" id="tab-columns">
   <div class="setup-panel">
     <div class="setup-left">
       <div class="card">
-        <div class="card-title">Column Groups</div>
-        <div id="groupList"></div>
+        <div class="card-title">Column Groups <span style="font-size:10px;color:var(--text3);font-weight:400">— drag ⠿ to reorder groups or columns</span></div>
+        <div id="groupList" class="group-list-container"></div>
       </div>
     </div>
     <div class="setup-right">
       <div class="card">
         <div class="card-title">Add Group</div>
-        <div class="field-row">
-          <input id="newGroupName" placeholder="Group name (e.g. A-50060100)" style="max-width:100%">
-        </div>
+        <div class="field-row"><input id="newGroupName" placeholder="Group name (e.g. A-50060100)" style="max-width:100%"></div>
         <button class="btn btn-primary btn-sm" onclick="addGroup()">+ Add Group</button>
       </div>
       <div class="card">
         <div class="card-title">Add Column to Group</div>
-        <div class="field-row">
-          <select id="addColGroup" style="max-width:100%;margin-bottom:6px;"></select>
-        </div>
-        <div class="field-row">
-          <input id="newColName" placeholder="Column name…" style="margin-bottom:6px;">
-        </div>
+        <div class="field-row"><select id="addColGroup" style="max-width:100%;margin-bottom:6px;"></select></div>
+        <div class="field-row"><input id="newColName" placeholder="Column name…" style="margin-bottom:6px;"></div>
         <div class="field-row">
           <select id="newColType" onchange="onNewColTypeChange()" style="max-width:140px;">
             <option value="text">Text</option>
@@ -305,15 +298,11 @@ td input[type=date]{max-width:130px;}
         </div>
         <button class="btn btn-primary btn-sm" style="width:100%" onclick="addColumnToGroup()">+ Add Column</button>
       </div>
-      <div class="card">
-        <div class="card-title">Ungrouped Columns</div>
-        <div id="ungroupedList" style="font-size:12px;color:var(--text3)">None</div>
-      </div>
     </div>
   </div>
 </div>
 
-<!-- ══ FORMULA MANAGER ══ -->
+<!-- FORMULA MANAGER -->
 <div class="tab-panel" id="tab-formulas">
   <div style="display:flex;gap:14px;height:100%;min-height:0;">
     <div style="flex:1;min-width:0;overflow-y:auto;">
@@ -335,14 +324,14 @@ td input[type=date]{max-width:130px;}
           <span class="fb-op" onclick="fbAppend('/')">÷</span>
           <span class="fb-op" onclick="fbAppend('(')">(</span>
           <span class="fb-op" onclick="fbAppend(')')">)</span>
-          <span class="fb-op" onclick="fbAppend('1000')" title="useful for /1000">1000</span>
+          <span class="fb-op" onclick="fbAppend('1000')">1000</span>
           <span class="fb-op" onclick="fbAppend('SUM(')">SUM(</span>
           <span class="fb-op" onclick="fbAppend('AVG(')">AVG(</span>
         </div>
         <div class="section-lbl" style="margin-top:8px;">Preview</div>
         <div class="fb-preview" id="fbPreview">—</div>
         <input id="fbRawInput" placeholder="Type or edit formula directly…" style="font-family:var(--mono);font-size:12px;color:var(--accent3);margin-bottom:6px;" oninput="onFbRaw()">
-        <div style="font-size:11px;color:var(--text3);font-family:var(--mono);margin-bottom:8px;">Syntax: <span style="color:var(--accent2)">[Column Name]+[Other Col]/1000</span></div>
+        <div style="font-size:11px;color:var(--text3);font-family:var(--mono);margin-bottom:8px;">Syntax: <span style="color:var(--accent2)">[Col Name]+[Other]/1000</span></div>
         <div style="display:flex;gap:5px;flex-wrap:wrap;">
           <button class="btn btn-ghost btn-sm" onclick="fbClear()">Clear</button>
           <button class="btn btn-primary btn-sm" onclick="fbApply()">✓ Apply to Selected</button>
@@ -353,7 +342,7 @@ td input[type=date]{max-width:130px;}
   </div>
 </div>
 
-<!-- ══ IMPORT EXCEL ══ -->
+<!-- IMPORT EXCEL -->
 <div class="tab-panel" id="tab-import">
   <div style="overflow-y:auto;flex:1;min-height:0;">
     <div class="import-zone" id="importZone" onclick="document.getElementById('importFileInput').click()"
@@ -366,6 +355,7 @@ td input[type=date]{max-width:130px;}
       <input type="file" id="importFileInput" accept=".xlsx,.xls" onchange="handleImportFile(event)">
     </div>
     <div id="importPreview" style="display:none">
+      <div class="import-info" id="importInfoBox"></div>
       <div class="import-preview-card">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
           <div>
@@ -396,7 +386,7 @@ td input[type=date]{max-width:130px;}
   </div>
 </div>
 
-<!-- ══ TEMPLATES ══ -->
+<!-- TEMPLATES -->
 <div class="tab-panel" id="tab-templates">
   <div style="overflow-y:auto;flex:1;min-height:0;">
     <div class="card" style="margin-bottom:12px;">
@@ -441,7 +431,6 @@ td input[type=date]{max-width:130px;}
   </div>
 </div>
 
-<!-- Load Template Modal -->
 <div class="modal-bg" id="loadTplModal">
   <div class="modal">
     <h3>Load Template</h3>
@@ -456,90 +445,75 @@ td input[type=date]{max-width:130px;}
 <div id="toast"></div>
 
 <script>
-// ═══════════════════════════════════════════════════
+// ═══════════════════════════════════
 //  DATA MODEL
-//  groups: [{id, name, cols:[{id,name,type,options,formula}]}]
-//  rows:   [{id, cells:{colId:val}}]
-// ═══════════════════════════════════════════════════
+// ═══════════════════════════════════
 let groups    = [];
 let rows      = [];
 let templates = {};
 let editingRowId = null;
 let searchQuery  = '';
+let searchColId  = null; // null = all columns
 
-// Formula builder state
-let fbTargetType = null;  // 'newcol' | 'editcol' | colId
 let fbBuffer = '';
-
-// Import state
+let fbTargetType = null;
 let importData = null;
-
-// Edit col state
 let editingColId  = null;
 let editingColGid = null;
+let selectedFmColId = null;
 
-// ── init ──
+// Drag-drop state
+let dragSrcGroupIdx = null;
+let dragSrcColIdx   = null;
+
 window.onload = () => { loadStorage(); renderAll(); };
 
 function loadStorage() {
-  groups    = JSON.parse(localStorage.getItem('mep3_groups')    || '[]');
-  rows      = JSON.parse(localStorage.getItem('mep3_rows')      || '[]');
-  templates = JSON.parse(localStorage.getItem('mep3_templates') || '{}');
-  // migrate old format
+  groups    = JSON.parse(localStorage.getItem('mep4_groups')    || '[]');
+  rows      = JSON.parse(localStorage.getItem('mep4_rows')      || '[]');
+  templates = JSON.parse(localStorage.getItem('mep4_templates') || '{}');
   if (!groups.length) {
-    const oldCols = JSON.parse(localStorage.getItem('mep_columns') || '[]');
-    if (oldCols.length) {
-      groups = [{id:uid(), name:'General', cols:oldCols}];
-    } else {
-      groups = [
-        {id:uid(), name:'Project Info', cols:[
-          {id:uid(),name:'Project ID',type:'text',options:[],formula:''},
-          {id:uid(),name:'Description',type:'text',options:[],formula:''},
-          {id:uid(),name:'Status',type:'select',options:['Pending','In Progress','Completed','On Hold'],formula:''},
-          {id:uid(),name:'Date',type:'date',options:[],formula:''},
-        ]},
-        {id:uid(), name:'Boiler Structure', cols:[
-          {id:uid(),name:'COLUMN',type:'number',options:[],formula:''},
-          {id:uid(),name:'BEAM',type:'number',options:[],formula:''},
-          {id:uid(),name:'BRACING',type:'number',options:[],formula:''},
-          {id:uid(),name:'Estimation Kgs',type:'number',options:[],formula:''},
-          {id:uid(),name:'BAAN Kgs',type:'number',options:[],formula:''},
-          {id:uid(),name:'Over/Saving MT',type:'formula',options:[],formula:'([Estimation Kgs]-[BAAN Kgs])/1000'},
-        ]},
-      ];
-    }
+    // Only set demo data if nothing saved
+    groups = [
+      {id:uid(), name:'Project Info', cols:[
+        {id:uid(),name:'S.NO.',type:'number',options:[],formula:''},
+        {id:uid(),name:'Project ID',type:'text',options:[],formula:''},
+        {id:uid(),name:'Project Name',type:'text',options:[],formula:''},
+        {id:uid(),name:'Status',type:'select',options:['Active','Completed','On Hold','Pending'],formula:''},
+      ]},
+    ];
     save();
   }
   allCols().forEach(c => { if (!c.formula) c.formula=''; });
 }
 
 function save() {
-  localStorage.setItem('mep3_groups',    JSON.stringify(groups));
-  localStorage.setItem('mep3_rows',      JSON.stringify(rows));
-  localStorage.setItem('mep3_templates', JSON.stringify(templates));
+  localStorage.setItem('mep4_groups',    JSON.stringify(groups));
+  localStorage.setItem('mep4_rows',      JSON.stringify(rows));
+  localStorage.setItem('mep4_templates', JSON.stringify(templates));
 }
 
 function uid() { return '_'+Math.random().toString(36).substr(2,9); }
 function allCols() { return groups.flatMap(g=>g.cols); }
 function findCol(id) { for (const g of groups) { const c=g.cols.find(x=>x.id===id); if(c) return {col:c,group:g}; } return null; }
 
-// ═══════════════════════════════════════════════════
+// ═══════════════════════════════════
 //  TABS
-// ═══════════════════════════════════════════════════
+// ═══════════════════════════════════
 function switchTab(name) {
   document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('tab-'+name).classList.add('active');
   document.querySelector(`.tab-btn[onclick*="${name}"]`).classList.add('active');
-  if (name==='entry')     renderAll();
+  if (name==='entry')     { renderAll(); buildSearchDropdown(); }
   if (name==='columns')   renderColumnSetup();
   if (name==='formulas')  renderFormulaManager();
   if (name==='templates') renderTemplates();
 }
 
-// ═══════════════════════════════════════════════════
+// ═══════════════════════════════════
 //  FORMULA ENGINE
-// ═══════════════════════════════════════════════════
+// ═══════════════════════════════════
 function evalFormula(formula, row) {
   if (!formula||!formula.trim()) return null;
   try {
@@ -558,9 +532,61 @@ function evalFormula(formula, row) {
   } catch { return null; }
 }
 
-// ═══════════════════════════════════════════════════
-//  RENDER — DATA TABLE
-// ═══════════════════════════════════════════════════
+// ═══════════════════════════════════
+//  SEARCH WITH COLUMN PICKER
+// ═══════════════════════════════════
+function buildSearchDropdown() {
+  const list = document.getElementById('sdColList');
+  let html = '';
+  groups.forEach(g => {
+    if (!g.cols.length) return;
+    html += `<div class="sd-group">${g.name}</div>`;
+    g.cols.forEach(c => {
+      const active = searchColId === c.id ? ' active' : '';
+      const icon = {text:'T',number:'#',date:'📅',select:'▾',formula:'∑'}[c.type]||'T';
+      html += `<div class="sd-item${active}" onclick="setSearchCol('${c.id}')">${icon} ${c.name}</div>`;
+    });
+  });
+  list.innerHTML = html;
+}
+
+function toggleSearchDropdown() {
+  const dd = document.getElementById('searchDropdown');
+  buildSearchDropdown();
+  dd.classList.toggle('open');
+}
+
+function setSearchCol(colId) {
+  searchColId = colId;
+  const btn = document.getElementById('searchColBtn');
+  const lbl = document.getElementById('searchColLabel');
+  if (colId === null) {
+    lbl.textContent = 'All Columns';
+    btn.classList.remove('has-col');
+  } else {
+    const col = allCols().find(c=>c.id===colId);
+    lbl.textContent = col ? col.name : 'All Columns';
+    btn.classList.add('has-col');
+  }
+  document.getElementById('searchDropdown').classList.remove('open');
+  filterRows();
+}
+
+function onSearchKey(e) {
+  if (e.key==='Escape') document.getElementById('searchDropdown').classList.remove('open');
+}
+
+// Close dropdown when clicking outside
+document.addEventListener('click', e => {
+  const wrap = document.getElementById('searchWrap');
+  if (wrap && !wrap.contains(e.target)) {
+    document.getElementById('searchDropdown').classList.remove('open');
+  }
+});
+
+// ═══════════════════════════════════
+//  RENDER TABLE
+// ═══════════════════════════════════
 function renderAll() { renderTableHead(); renderTableBody(); renderStats(); }
 
 function renderStats() {
@@ -582,22 +608,17 @@ function renderStats() {
 
 function renderTableHead() {
   const head=document.getElementById('tHead');
-  // Row 1: group headers
   let gr1='<tr class="group-row"><th class="no-group num-th">#</th>';
-  // Row 2: sub-column headers
   let gr2='<tr class="sub-row"><th class="num-th">#</th>';
-
-  // Track column group borders
-  const groupBorderCols = new Set();
   groups.forEach(g => {
-    if (g.cols.length===0) return;
+    if (!g.cols.length) return;
     const lastCol = g.cols[g.cols.length-1];
-    groupBorderCols.add(lastCol.id);
     gr1+=`<th colspan="${g.cols.length}" title="${g.name}">${g.name}</th>`;
     g.cols.forEach(c=>{
       const icon={text:'T',number:'#',date:'📅',select:'▾',formula:'∑'}[c.type]||'T';
       const isLast=c.id===lastCol.id;
-      gr2+=`<th class="${c.type==='formula'?'formula-th':''}" style="${isLast?'border-right:1px solid var(--border-active)':''}" title="${c.name}"><span style="opacity:.45;font-size:9px">${icon} </span>${c.name}</th>`;
+      const isSearched = searchColId===c.id;
+      gr2+=`<th class="${c.type==='formula'?'formula-th':''}" style="${isLast?'border-right:1px solid var(--border-active)':''}${isSearched?';background:rgba(247,201,79,.12);color:var(--accent3)':''}" title="${c.name}"><span style="opacity:.45;font-size:9px">${icon} </span>${c.name}${isSearched?' 🔍':''}</th>`;
     });
   });
   gr1+='<th class="no-group" style="width:64px">Act.</th></tr>';
@@ -609,11 +630,32 @@ function renderTableBody() {
   const tbody=document.getElementById('tBody');
   const q=searchQuery.toLowerCase().trim();
   let visible=rows;
-  if(q) visible=rows.filter(r=>allCols().some(c=>{
-    const v=c.type==='formula'?String(evalFormula(c.formula,r)??''):String(r.cells[c.id]||'');
-    return v.toLowerCase().includes(q);
-  }));
-  document.getElementById('recCount').textContent=q?`${visible.length} of ${rows.length} rows`:`${rows.length} rows`;
+
+  if (q) {
+    visible = rows.filter(r => {
+      if (searchColId) {
+        // Filter only on selected column
+        const col = allCols().find(c=>c.id===searchColId);
+        if (!col) return false;
+        const v = col.type==='formula' ? String(evalFormula(col.formula,r)??'') : String(r.cells[col.id]||'');
+        return v.toLowerCase().includes(q);
+      } else {
+        // All columns
+        return allCols().some(c => {
+          const v=c.type==='formula'?String(evalFormula(c.formula,r)??''):String(r.cells[c.id]||'');
+          return v.toLowerCase().includes(q);
+        });
+      }
+    });
+  }
+
+  const countEl = document.getElementById('recCount');
+  if (q) {
+    const colName = searchColId ? (allCols().find(c=>c.id===searchColId)?.name||'') : 'all columns';
+    countEl.textContent=`${visible.length} of ${rows.length} rows (in ${colName})`;
+  } else {
+    countEl.textContent=`${rows.length} rows`;
+  }
 
   if(!allCols().length){tbody.innerHTML=`<tr><td colspan="99"><div class="empty-state"><div class="ei">⚙</div><p>No columns. Go to <strong>Column Setup</strong>.</p></div></td></tr>`;return;}
   if(!visible.length){tbody.innerHTML=`<tr><td colspan="${allCols().length+2}"><div class="empty-state"><div class="ei">${q?'🔍':'📋'}</div><p>${q?'No matches found.':'Click <strong>+ Add Row</strong> to begin.'}</p></div></td></tr>`;return;}
@@ -623,20 +665,22 @@ function renderTableBody() {
   rows.forEach(r=>{
     if(!visIds.has(r.id))return;
     const isEdit=editingRowId===r.id;
-    html+=`<tr id="row_${r.id}" class="${isEdit?'editing':''}${q?' highlighted':''}"><td class="num-td">${idx++}</td>`;
+    html+=`<tr id="row_${r.id}" class="${isEdit?'editing':''}${q&&!searchColId?' highlighted':''}">`;
+    html+=`<td class="num-td">${idx++}</td>`;
     groups.forEach((g,gi)=>{
       g.cols.forEach((c,ci)=>{
         const isLastInGroup=ci===g.cols.length-1;
         const borderCls=isLastInGroup&&gi<groups.length-1?'group-border':'';
+        const isMatchCol = q && searchColId===c.id ? ' match-cell' : '';
         if(c.type==='formula'){
           const res=evalFormula(c.formula,r);
           const disp=res===null||isNaN(res)?'—':Number(res.toFixed(4)).toLocaleString();
-          html+=`<td class="formula-cell ${borderCls}" title="${c.formula}">${disp}</td>`;
+          html+=`<td class="formula-cell ${borderCls}${isMatchCol}" title="${c.formula}">${disp}</td>`;
         } else if(isEdit){
           html+=`<td class="${borderCls}">${buildInp(c,r.cells[c.id]||'',r.id)}</td>`;
         } else {
           const val=r.cells[c.id]||'';
-          html+=`<td class="${borderCls}" title="${val}">${val}</td>`;
+          html+=`<td class="${borderCls}${isMatchCol}" title="${val}">${val}</td>`;
         }
       });
     });
@@ -660,15 +704,15 @@ function buildInp(col,val,rowId){
   return `<input type="text" id="${id}" value="${val}" onkeydown="if(event.key==='Enter')saveRow('${rowId}')">`;
 }
 
-// ═══════════════════════════════════════════════════
+// ═══════════════════════════════════
 //  ROW OPS
-// ═══════════════════════════════════════════════════
+// ═══════════════════════════════════
 function addNewRow(){
   if(!allCols().length){showToast('Add columns first','error');switchTab('columns');return;}
   const r={id:uid(),cells:{}};
   allCols().forEach(c=>r.cells[c.id]='');
-  rows.push(r); editingRowId=r.id; save(); renderTableBody(); renderStats();
-  const wrap=document.querySelector('.table-wrap'); wrap.scrollTop=wrap.scrollHeight;
+  rows.push(r);editingRowId=r.id;save();renderTableBody();renderStats();
+  const wrap=document.querySelector('.table-wrap');wrap.scrollTop=wrap.scrollHeight;
   setTimeout(()=>{const f=document.querySelector(`#row_${r.id} td input,#row_${r.id} td select`);if(f)f.focus();},60);
 }
 function editRow(id){if(editingRowId&&editingRowId!==id)saveRow(editingRowId);editingRowId=id;renderTableBody();setTimeout(()=>{const f=document.querySelector(`#row_${id} td input,#row_${id} td select`);if(f)f.focus();},60);}
@@ -683,27 +727,38 @@ function cancelEdit(id){
   editingRowId=null;renderTableBody();
 }
 function deleteRow(id){if(!confirm('Delete this row?'))return;rows=rows.filter(r=>r.id!==id);save();renderTableBody();renderStats();showToast('Row deleted','info');}
-function filterRows(){searchQuery=document.getElementById('searchInput').value;renderTableBody();}
-function clearSearch(){document.getElementById('searchInput').value='';searchQuery='';renderTableBody();}
+function filterRows(){searchQuery=document.getElementById('searchInput').value;renderTableBody();renderTableHead();}
+function clearSearch(){document.getElementById('searchInput').value='';searchQuery='';searchColId=null;setSearchCol(null);renderTableBody();renderTableHead();}
 
-// ═══════════════════════════════════════════════════
-//  COLUMN SETUP
-// ═══════════════════════════════════════════════════
+// ═══════════════════════════════════
+//  COLUMN SETUP WITH DRAG & DROP
+// ═══════════════════════════════════
 function renderColumnSetup(){
-  // Group list
   const gl=document.getElementById('groupList');
   if(!groups.length){gl.innerHTML='<div style="font-size:12px;color:var(--text3)">No groups yet.</div>';return;}
-  gl.innerHTML=groups.map(g=>`
-    <div class="group-item">
+  gl.innerHTML=groups.map((g,gi)=>`
+    <div class="group-item" id="group_${g.id}" draggable="true"
+         ondragstart="onGroupDragStart(event,${gi})"
+         ondragover="onGroupDragOver(event,${gi})"
+         ondragleave="onGroupDragLeave(event)"
+         ondrop="onGroupDrop(event,${gi})"
+         ondragend="onGroupDragEnd(event)">
       <div class="group-hdr" onclick="toggleGroup('${g.id}')">
+        <span class="drag-handle" title="Drag to reorder group" onclick="event.stopPropagation()">⠿</span>
         <span class="group-toggle" id="gt_${g.id}">▶</span>
         <span class="group-name">${g.name}</span>
         <span class="group-badge">${g.cols.length} cols</span>
         <button class="btn-icon del btn-sm" style="margin-left:auto" onclick="event.stopPropagation();removeGroup('${g.id}')" title="Delete group">🗑</button>
       </div>
       <div class="group-cols" id="gc_${g.id}">
-        ${g.cols.map(c=>`
-          <div class="col-row-item">
+        ${g.cols.map((c,ci)=>`
+          <div class="col-row-item" id="col_${c.id}" draggable="true"
+               ondragstart="onColDragStart(event,${gi},${ci})"
+               ondragover="onColDragOver(event,${gi},${ci})"
+               ondragleave="onColDragLeave(event)"
+               ondrop="onColDrop(event,${gi},${ci})"
+               ondragend="onColDragEnd(event)">
+            <span class="col-drag-handle">⠿</span>
             <span class="col-chip-name">${c.name}</span>
             <span class="type-pill tp-${c.type}">${c.type}</span>
             ${c.type==='formula'?`<span class="type-pill" style="background:var(--purple-dim);color:var(--purple)" title="${c.formula}">∑</span>`:''}
@@ -714,16 +769,76 @@ function renderColumnSetup(){
       </div>
     </div>`).join('');
 
-  // Populate group dropdown
   const sel=document.getElementById('addColGroup');
   sel.innerHTML=groups.map(g=>`<option value="${g.id}">${g.name}</option>`).join('');
 }
 
 function toggleGroup(id){
-  const gc=document.getElementById('gc_'+id);
-  const gt=document.getElementById('gt_'+id);
-  gc.classList.toggle('open');
-  gt.classList.toggle('open');
+  document.getElementById('gc_'+id).classList.toggle('open');
+  document.getElementById('gt_'+id).classList.toggle('open');
+}
+
+// ── Group drag & drop ──
+function onGroupDragStart(e, gi) {
+  dragSrcGroupIdx = gi;
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('type','group');
+  setTimeout(()=> document.getElementById('group_'+groups[gi].id)?.classList.add('dragging'), 0);
+}
+function onGroupDragOver(e, gi) {
+  if (dragSrcGroupIdx === null || e.dataTransfer.getData('type')==='col') return;
+  e.preventDefault();
+  document.querySelectorAll('.group-item').forEach(el=>el.classList.remove('drag-over'));
+  document.getElementById('group_'+groups[gi].id)?.classList.add('drag-over');
+}
+function onGroupDragLeave(e) {
+  e.currentTarget.classList.remove('drag-over');
+}
+function onGroupDrop(e, gi) {
+  e.preventDefault();
+  e.stopPropagation();
+  if (dragSrcGroupIdx===null||dragSrcGroupIdx===gi) return;
+  const moved = groups.splice(dragSrcGroupIdx, 1)[0];
+  groups.splice(gi, 0, moved);
+  dragSrcGroupIdx = null;
+  save(); renderColumnSetup();
+}
+function onGroupDragEnd(e) {
+  dragSrcGroupIdx = null;
+  document.querySelectorAll('.group-item').forEach(el=>{el.classList.remove('dragging');el.classList.remove('drag-over');});
+}
+
+// ── Column drag & drop within same group ──
+function onColDragStart(e, gi, ci) {
+  dragSrcGroupIdx = gi; dragSrcColIdx = ci;
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('type','col');
+  e.stopPropagation();
+  setTimeout(()=>document.getElementById('col_'+groups[gi].cols[ci].id)?.classList.add('col-dragging'),0);
+}
+function onColDragOver(e, gi, ci) {
+  if (dragSrcColIdx===null||dragSrcGroupIdx!==gi) return;
+  e.preventDefault();
+  e.stopPropagation();
+  document.querySelectorAll('.col-row-item').forEach(el=>el.classList.remove('col-drag-over'));
+  document.getElementById('col_'+groups[gi].cols[ci].id)?.classList.add('col-drag-over');
+}
+function onColDragLeave(e) {
+  e.currentTarget.classList.remove('col-drag-over');
+}
+function onColDrop(e, gi, ci) {
+  e.preventDefault();
+  e.stopPropagation();
+  if (dragSrcColIdx===null||dragSrcGroupIdx!==gi||dragSrcColIdx===ci) return;
+  const cols = groups[gi].cols;
+  const moved = cols.splice(dragSrcColIdx,1)[0];
+  cols.splice(ci,0,moved);
+  dragSrcColIdx=null; dragSrcGroupIdx=null;
+  save(); renderColumnSetup(); renderAll();
+}
+function onColDragEnd(e) {
+  dragSrcColIdx=null;
+  document.querySelectorAll('.col-row-item').forEach(el=>{el.classList.remove('col-dragging');el.classList.remove('col-drag-over');});
 }
 
 function addGroup(){
@@ -777,9 +892,8 @@ function removeCol(gid,cid){
   save();renderColumnSetup();renderAll();showToast('Column removed','info');
 }
 
-// Edit column modal
 function openEditCol(gid,cid){
-  editingColId=cid; editingColGid=gid;
+  editingColId=cid;editingColGid=gid;
   const g=groups.find(x=>x.id===gid);
   const c=g.cols.find(x=>x.id===cid);
   document.getElementById('ecName').value=c.name;
@@ -806,16 +920,14 @@ function saveEditCol(){
 }
 function closeEditCol(){document.getElementById('editColModal').classList.remove('show');}
 
-// ═══════════════════════════════════════════════════
+// ═══════════════════════════════════
 //  FORMULA MANAGER
-// ═══════════════════════════════════════════════════
-let selectedFmColId = null;
-
+// ═══════════════════════════════════
 function renderFormulaManager(){
   const list=document.getElementById('fmList');
   const formulaCols=allCols().filter(c=>c.type==='formula');
   if(!formulaCols.length){
-    list.innerHTML='<div style="font-size:13px;color:var(--text3);">No formula columns yet. Add a column with type "Formula ∑" in Column Setup.</div>';
+    list.innerHTML='<div style="font-size:13px;color:var(--text3);">No formula columns yet.</div>';
   } else {
     list.innerHTML=formulaCols.map(c=>{
       const {group}=findCol(c.id)||{};
@@ -830,20 +942,16 @@ function renderFormulaManager(){
           </button>
         </div>
         ${c.formula
-          ? `<div class="fm-formula-box" onclick="selectFmCol('${c.id}')" title="Click to select">${c.formula}</div>`
-          : `<div class="fm-no-formula">No formula set — select this column and use the builder →</div>`
+          ? `<div class="fm-formula-box" onclick="selectFmCol('${c.id}')">${c.formula}</div>`
+          : `<div class="fm-no-formula">No formula set — select and use the builder →</div>`
         }
       </div>`;
     }).join('');
   }
-
-  // Populate formula builder column refs
   const grid=document.getElementById('fbColGrid');
-  grid.innerHTML=allCols()
-    .filter(c=>c.type!=='formula'||(c.id!==selectedFmColId))
+  grid.innerHTML=allCols().filter(c=>c.type!=='formula'||(c.id!==selectedFmColId))
     .map(c=>`<button class="fb-col-btn" onclick="fbAppend('[${c.name}]')" title="${c.name}">${c.name}</button>`)
     .join('');
-
   updateFbTarget();
 }
 
@@ -852,65 +960,47 @@ function selectFmCol(id){
   const col=allCols().find(c=>c.id===id);
   fbBuffer=col.formula||'';
   document.getElementById('fbRawInput').value=fbBuffer;
-  updateFbPreview();
-  renderFormulaManager();
+  updateFbPreview();renderFormulaManager();
 }
-
 function updateFbTarget(){
   const el=document.getElementById('fbTarget');
-  if(selectedFmColId){
-    const col=allCols().find(c=>c.id===selectedFmColId);
-    el.textContent=`Editing formula for: "${col?col.name:'?'}"`;
-    el.style.color='var(--accent2)';
-  } else {
-    el.textContent='Select a formula column above first';
-    el.style.color='var(--text3)';
-  }
+  if(selectedFmColId){const col=allCols().find(c=>c.id===selectedFmColId);el.textContent=`Editing: "${col?col.name:'?'}"`;el.style.color='var(--accent2)';}
+  else{el.textContent='Select a formula column above first';el.style.color='var(--text3)';}
 }
-
 function fbAppend(token){fbBuffer+=token;document.getElementById('fbRawInput').value=fbBuffer;updateFbPreview();}
 function onFbRaw(){fbBuffer=document.getElementById('fbRawInput').value;updateFbPreview();}
 function fbClear(){fbBuffer='';document.getElementById('fbRawInput').value='';updateFbPreview();}
 function updateFbPreview(){document.getElementById('fbPreview').textContent=fbBuffer||'—';}
-
 function fbApply(){
   if(!selectedFmColId){showToast('Select a formula column first','error');return;}
   const col=allCols().find(c=>c.id===selectedFmColId);
   if(col){col.formula=fbBuffer.trim();save();renderFormulaManager();renderAll();showToast(`Formula applied to "${col.name}"`,'success');}
 }
-
-// formula builder from column setup / edit col
 function openFormulaBuilder(target){
   fbTargetType=target;
   if(target==='newcol') fbBuffer=document.getElementById('newColFormula').value;
   else if(target==='editcol') fbBuffer=document.getElementById('ecFormula').value;
-  // switch to formula tab and select
   switchTab('formulas');
-  // set buffer
   document.getElementById('fbRawInput').value=fbBuffer;
   updateFbPreview();
   showToast('Use the builder then click Apply','info');
-  // override apply
-  const oldApply=document.querySelector('.tab-panel#tab-formulas .btn-primary[onclick="fbApply()"]');
 }
 
-// ═══════════════════════════════════════════════════
-//  EXCEL IMPORT
-// ═══════════════════════════════════════════════════
+// ═══════════════════════════════════
+//  EXCEL IMPORT — FIXED
+// ═══════════════════════════════════
 function handleDrop(e){e.preventDefault();document.getElementById('importZone').classList.remove('drag-active');const f=e.dataTransfer.files[0];if(f)processFile(f);}
 function handleImportFile(e){const f=e.target.files[0];if(f)processFile(f);e.target.value='';}
 
-function colLetter(idx){ // 0-based
+function colLetter(idx){
   let s='';idx++;
   while(idx>0){idx--;s=String.fromCharCode(65+(idx%26))+s;idx=Math.floor(idx/26);}
   return s;
 }
 
 function excelFormulaToOurs(excelFormula, colMap){
-  // colMap: letterUpper -> colName
   if(!excelFormula||!excelFormula.startsWith('='))return '';
   let f=excelFormula.slice(1);
-  // replace cell refs: AK201 -> [ColName]
   f=f.replace(/([A-Z]{1,3})\d+/g,(_,letter)=>{
     const name=colMap[letter];
     return name?`[${name}]`:letter;
@@ -926,12 +1016,13 @@ function processFile(file){
       const wb=XLSX.read(e.target.result,{type:'binary',cellFormula:true,cellDates:true});
       const sheetName=wb.SheetNames[0];
       const ws=wb.Sheets[sheetName];
-      const range=XLSX.utils.decode_range(ws['!ref']||'A1');
+      if(!ws['!ref']){showToast('Empty sheet','error');return;}
+      const range=XLSX.utils.decode_range(ws['!ref']);
 
-      // ── Parse merged cells to find group spans ──
-      const mergedGroups=[]; // {name, minCol, maxCol}
-      // We'll use XLSX merged cell info
+      // ── Detect header rows ──
+      // Row 1 = group headers (merged), Row 2 = sub-headers (or single header if no row 2)
       const merges=(ws['!merges'])||[];
+      const mergedGroups=[];
       merges.forEach(m=>{
         if(m.s.r===0&&m.e.r===0&&m.e.c>m.s.c){
           const cell=ws[XLSX.utils.encode_cell({r:0,c:m.s.c})];
@@ -941,33 +1032,35 @@ function processFile(file){
         }
       });
 
-      // Also pick single-cell headers in row 1 that have values
       const row1Singles={};
       for(let c=range.s.c;c<=range.e.c;c++){
         const cell=ws[XLSX.utils.encode_cell({r:0,c})];
         if(cell&&cell.v){
           const inGroup=mergedGroups.some(g=>c>=g.minCol&&c<=g.maxCol);
-          if(!inGroup) row1Singles[c]=String(cell.v).replace(/\n/g,' ').trim();
+          if(!inGroup)row1Singles[c]=String(cell.v).replace(/\n/g,' ').trim();
         }
       }
 
-      // ── Sub-headers (row 2) ──
-      const subHeaders={}; // colIdx -> name
+      // Sub-headers (row 2 if groups exist, else row 1 is sub-headers)
+      const hasGroupHeaders = mergedGroups.length>0;
+      const subHeaderRow = hasGroupHeaders ? 1 : 0;
+      const dataStartRow  = hasGroupHeaders ? 2 : 1;
+
+      const subHeaders={};
       for(let c=range.s.c;c<=range.e.c;c++){
-        const cell=ws[XLSX.utils.encode_cell({r:1,c})];
-        if(cell&&cell.v) subHeaders[c]=String(cell.v).replace(/\n/g,' ').trim();
+        const cell=ws[XLSX.utils.encode_cell({r:subHeaderRow,c})];
+        if(cell&&cell.v)subHeaders[c]=String(cell.v).replace(/\n/g,' ').trim();
       }
 
-      // Build col letter map for formula conversion
       const letterToName={};
       for(let c=range.s.c;c<=range.e.c;c++){
         const name=subHeaders[c]||row1Singles[c];
-        if(name) letterToName[colLetter(c)]=name;
+        if(name)letterToName[colLetter(c)]=name;
       }
 
-      // ── Detect formula columns ──
-      const formulaByCol={}; // colIdx -> formula string
-      for(let r=range.s.r+2;r<=Math.min(range.e.r,range.s.r+200);r++){
+      // ── Detect formula columns from actual formula cells ──
+      const formulaByCol={};
+      for(let r=dataStartRow;r<=Math.min(range.e.r,dataStartRow+200);r++){
         for(let c=range.s.c;c<=range.e.c;c++){
           const cell=ws[XLSX.utils.encode_cell({r,c})];
           if(cell&&cell.f&&!formulaByCol[c]){
@@ -981,9 +1074,9 @@ function processFile(file){
       for(let c=range.s.c;c<=range.e.c;c++){
         if(formulaByCol[c]){typeByCol[c]='formula';continue;}
         let nums=0,dates=0,total=0;
-        for(let r=range.s.r+2;r<=Math.min(range.e.r,range.s.r+10);r++){
+        for(let r=dataStartRow;r<=Math.min(range.e.r,dataStartRow+20);r++){
           const cell=ws[XLSX.utils.encode_cell({r,c})];
-          if(!cell||!cell.v)continue;
+          if(!cell||cell.v===undefined||cell.v===null||cell.v==='')continue;
           total++;
           if(cell.t==='n')nums++;
           if(cell.t==='d')dates++;
@@ -993,26 +1086,33 @@ function processFile(file){
         else typeByCol[c]='text';
       }
 
-      // ── Data rows ──
+      // ── Data rows — only import non-empty rows ──
       const dataRows=[];
-      for(let r=range.s.r+2;r<=range.e.r;r++){
+      let nonEmptyDataCount=0;
+      for(let r=dataStartRow;r<=range.e.r;r++){
         const rowObj={};let hasAny=false;
         for(let c=range.s.c;c<=range.e.c;c++){
           const cell=ws[XLSX.utils.encode_cell({r,c})];
-          if(cell&&!cell.f&&cell.v!==undefined){rowObj[c]=String(cell.v);hasAny=true;}
-          else rowObj[c]='';
+          // Skip formula cells (will be computed); get raw values only
+          if(cell&&!cell.f&&cell.v!==undefined&&cell.v!==null&&cell.v!==''){
+            rowObj[c]=String(cell.v);
+            hasAny=true;
+          } else {
+            rowObj[c]='';
+          }
         }
-        if(hasAny)dataRows.push(rowObj);
+        if(hasAny)nonEmptyDataCount++;
+        dataRows.push(rowObj); // keep all rows to preserve row numbers
       }
 
-      // Build import data structure
       importData={
         sheetName,fileName:file.name,
         mergedGroups,row1Singles,subHeaders,
-        letterToName,formulaByCol,typeByCol,dataRows,
+        letterToName,formulaByCol,typeByCol,
+        dataRows,nonEmptyDataCount,
         totalCols:Object.keys({...subHeaders,...row1Singles}).length,
         totalRows:dataRows.length,
-        range
+        dataStartRow,range
       };
 
       renderImportPreview();
@@ -1022,14 +1122,19 @@ function processFile(file){
 }
 
 function renderImportPreview(){
-  const {fileName,sheetName,mergedGroups,row1Singles,subHeaders,formulaByCol,totalRows}=importData;
+  const {fileName,sheetName,mergedGroups,row1Singles,subHeaders,formulaByCol,totalRows,nonEmptyDataCount}=importData;
   document.getElementById('impFileName').textContent=fileName;
-  document.getElementById('impMeta').textContent=`Sheet: ${sheetName} · ${totalRows} data rows`;
+  document.getElementById('impMeta').textContent=`Sheet: ${sheetName} · ${totalRows} total rows · ${nonEmptyDataCount} with data`;
+
+  // Info box explaining what was found
+  const fmlCount = Object.keys(formulaByCol).length;
+  document.getElementById('importInfoBox').innerHTML=
+    `<b>Structure detected:</b> ${mergedGroups.length} group headers, ${Object.keys({...subHeaders,...row1Singles}).length} columns`+
+    (fmlCount?`, <b>${fmlCount} formula columns</b>`:`<br>ℹ No Excel formulas found in data rows — formula columns will be imported as empty and you can define formulas using the Formula Builder.`)+
+    `<br>ℹ Only rows with actual data will be imported (${nonEmptyDataCount} rows).`;
 
   const gl=document.getElementById('impGroupList');
   let html='';
-
-  // Grouped columns
   mergedGroups.forEach(g=>{
     const cols=[];
     for(let c=g.minCol;c<=g.maxCol;c++){
@@ -1040,30 +1145,19 @@ function renderImportPreview(){
     html+=`<div class="ig-item">
       <div class="ig-hdr"><span class="ig-name">${g.name}</span><span style="font-size:11px;color:var(--text3);font-family:var(--mono)">${cols.length} sub-cols</span></div>
       <div class="ig-sub-cols">
-        ${cols.map(col=>`
-          <label class="ig-col-check">
-            <input type="checkbox" id="ic_${col.idx}" checked>
-            ${col.name}${col.hasFormula?'<span class="fml-badge">∑</span>':''}
-          </label>`).join('')}
+        ${cols.map(col=>`<label class="ig-col-check"><input type="checkbox" id="ic_${col.idx}" checked> ${col.name}${col.hasFormula?'<span class="fml-badge">∑</span>':''}</label>`).join('')}
       </div>
     </div>`;
   });
-
-  // Ungrouped cols
   const ungroupedCols=Object.entries(row1Singles).map(([c,name])=>({idx:parseInt(c),name,hasFormula:!!formulaByCol[parseInt(c)]}));
   if(ungroupedCols.length){
     html+=`<div class="ig-item">
       <div class="ig-hdr"><span class="ig-name">Single Columns</span></div>
       <div class="ig-sub-cols">
-        ${ungroupedCols.map(col=>`
-          <label class="ig-col-check">
-            <input type="checkbox" id="ic_${col.idx}" checked>
-            ${col.name}${col.hasFormula?'<span class="fml-badge">∑</span>':''}
-          </label>`).join('')}
+        ${ungroupedCols.map(col=>`<label class="ig-col-check"><input type="checkbox" id="ic_${col.idx}" checked> ${col.name}${col.hasFormula?'<span class="fml-badge">∑</span>':''}</label>`).join('')}
       </div>
     </div>`;
   }
-
   gl.innerHTML=html||'<div style="color:var(--text3);font-size:12px">No recognized column structure found</div>';
   document.getElementById('importZone').style.display='none';
   document.getElementById('importPreview').style.display='block';
@@ -1077,14 +1171,13 @@ function cancelImport(){
 
 function confirmImport(){
   if(!importData)return;
-  const {mergedGroups,row1Singles,subHeaders,formulaByCol,letterToName,typeByCol,dataRows}=importData;
+  const {mergedGroups,row1Singles,subHeaders,formulaByCol,letterToName,typeByCol,dataRows,nonEmptyDataCount}=importData;
   const withData=document.getElementById('impWithData').checked;
   const withFormulas=document.getElementById('impWithFormulas').checked;
   const append=document.getElementById('impAppend').checked;
 
   if(!append){groups=[];rows=[];}
 
-  // Build groups from merged headers
   mergedGroups.forEach(g=>{
     const cols=[];
     for(let c=g.minCol;c<=g.maxCol;c++){
@@ -1099,14 +1192,10 @@ function confirmImport(){
     }
     if(!cols.length)return;
     const existing=groups.find(x=>x.name===g.name);
-    if(existing){
-      cols.forEach(nc=>{if(!existing.cols.find(ec=>ec.name===nc.name))existing.cols.push(nc);});
-    } else {
-      groups.push({id:uid(),name:g.name,cols});
-    }
+    if(existing){cols.forEach(nc=>{if(!existing.cols.find(ec=>ec.name===nc.name))existing.cols.push(nc);});}
+    else groups.push({id:uid(),name:g.name,cols});
   });
 
-  // Ungrouped
   const singleCols=[];
   Object.entries(row1Singles).forEach(([ci,name])=>{
     const c=parseInt(ci);
@@ -1123,21 +1212,22 @@ function confirmImport(){
     singleCols.forEach(c=>{if(!sg.cols.find(ec=>ec.name===c.name))sg.cols.push(c);});
   }
 
-  // Ensure all rows have cells for new cols
   const allNewCols=allCols();
   rows.forEach(r=>allNewCols.forEach(c=>{if(!(c.id in r.cells))r.cells[c.id]='';}));
 
-  // Import data rows
+  // Import ONLY non-empty rows
   if(withData){
-    // Build name→colId map
     const nameToCol={};
     allNewCols.forEach(c=>nameToCol[c.name]=c);
-
+    let importedCount=0;
     dataRows.forEach(dataRow=>{
+      // Check if this row has any actual data
+      const hasAnyData = Object.values(dataRow).some(v=>v!=='');
+      if(!hasAnyData) return;
       const cells={};
       allNewCols.forEach(c=>cells[c.id]='');
-      // Map by position: subHeaders[colIdx] -> name -> col
-      Object.entries({...dataRow}).forEach(([ci,val])=>{
+      Object.entries(dataRow).forEach(([ci,val])=>{
+        if(!val)return;
         const c=parseInt(ci);
         const name=subHeaders[c]||row1Singles[c];
         if(!name)return;
@@ -1145,18 +1235,23 @@ function confirmImport(){
         if(col&&col.type!=='formula')cells[col.id]=val;
       });
       rows.push({id:uid(),cells});
+      importedCount++;
     });
+    save();
+    cancelImport();
+    switchTab('entry');
+    showToast(`Imported ${groups.length} groups, ${allNewCols.length} cols, ${importedCount} data rows!`,'success');
+  } else {
+    save();
+    cancelImport();
+    switchTab('entry');
+    showToast(`Imported ${groups.length} groups, ${allNewCols.length} columns (no data rows)!`,'success');
   }
-
-  save();
-  cancelImport();
-  switchTab('entry');
-  showToast(`Imported ${groups.length} groups, ${allCols().length} cols${withData?', '+dataRows.length+' rows':''}!`,'success');
 }
 
-// ═══════════════════════════════════════════════════
+// ═══════════════════════════════════
 //  TEMPLATES
-// ═══════════════════════════════════════════════════
+// ═══════════════════════════════════
 function saveTpl(){
   const name=document.getElementById('tplName').value.trim();
   if(!name){showToast('Enter name','error');return;}
@@ -1165,7 +1260,6 @@ function saveTpl(){
   document.getElementById('tplName').value='';
   save();renderTemplates();showToast(`Template "${name}" saved`,'success');
 }
-
 function renderTemplates(){
   const el=document.getElementById('tplList');
   const names=Object.keys(templates);
@@ -1175,16 +1269,12 @@ function renderTemplates(){
     const totalCols=gs.reduce((a,g)=>a+g.cols.length,0);
     const fCols=gs.flatMap(g=>g.cols).filter(c=>c.type==='formula').length;
     return `<div class="tpl-item">
-      <div class="tpl-info">
-        <div class="tpl-name">${name}</div>
-        <div class="tpl-meta">${gs.length} groups · ${totalCols} cols${fCols?` · ${fCols} formulas`:''}</div>
-      </div>
+      <div class="tpl-info"><div class="tpl-name">${name}</div><div class="tpl-meta">${gs.length} groups · ${totalCols} cols${fCols?` · ${fCols} formulas`:''}</div></div>
       <button class="btn btn-primary btn-sm" onclick="loadTpl('${name}')">Load</button>
       <button class="btn btn-danger btn-sm" onclick="deleteTpl('${name}')">Del</button>
     </div>`;
   }).join('');
 }
-
 function loadTpl(name){
   document.getElementById('loadTplConfirm').onclick=()=>{
     groups=JSON.parse(JSON.stringify(templates[name]));
@@ -1196,12 +1286,11 @@ function loadTpl(name){
   };
   document.getElementById('loadTplModal').classList.add('show');
 }
-
 function deleteTpl(name){if(!confirm(`Delete "${name}"?`))return;delete templates[name];save();renderTemplates();showToast('Deleted','info');}
 
-// ═══════════════════════════════════════════════════
+// ═══════════════════════════════════
 //  EXPORT
-// ═══════════════════════════════════════════════════
+// ═══════════════════════════════════
 function exportToExcel(){
   if(!rows.length){showToast('No data to export','error');return;}
   const cols=allCols();
@@ -1219,9 +1308,9 @@ function exportToExcel(){
   showToast('Excel exported!','success');
 }
 
-// ═══════════════════════════════════════════════════
+// ═══════════════════════════════════
 //  UTILS
-// ═══════════════════════════════════════════════════
+// ═══════════════════════════════════
 function clearAllData(){if(!confirm('Clear ALL rows?'))return;rows=[];editingRowId=null;save();renderAll();showToast('Rows cleared','info');}
 
 let tTimer;
@@ -1233,7 +1322,6 @@ function showToast(msg,type='info'){
   clearTimeout(tTimer);tTimer=setTimeout(()=>t.className='',3000);
 }
 
-// Close modals on bg click
 ['editColModal','loadTplModal'].forEach(id=>{
   document.getElementById(id).addEventListener('click',e=>{if(e.target===e.currentTarget)e.target.classList.remove('show');});
 });
